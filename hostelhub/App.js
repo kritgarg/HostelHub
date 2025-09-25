@@ -20,10 +20,11 @@ export default function App() {
           <Tab.Navigator
             screenOptions={({ route }) => ({
               headerShown: false,
+              tabBarShowLabel: false,
               tabBarIcon: ({ focused, color, size }) => {
                 let iconName;
                 switch (route.name) {
-                  case 'Home':
+                  case 'HostelHub':
                     iconName = focused ? 'home' : 'home-outline';
                     break;
                   case 'Lost and Found':
@@ -49,16 +50,13 @@ export default function App() {
                 height: 70,
                 paddingVertical: 10,
               },
-              tabBarLabelStyle: {
-                fontSize: 14,
-                fontWeight: '600',
-              },
+              
               tabBarItemStyle: {
                 paddingVertical: 4,
               },
             })}
           >
-            <Tab.Screen name="Home" component={Home} />
+            <Tab.Screen name="HostelHub" component={Home} />
             <Tab.Screen name="Lost and Found" component={LostandFound} />
             <Tab.Screen name="Marketplace" component={Marketplace} />
             <Tab.Screen name="Profile" component={Profile} />
