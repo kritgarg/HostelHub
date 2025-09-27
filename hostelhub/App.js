@@ -10,6 +10,7 @@ import LostandFound from './screens/Landf';
 import Profile from './screens/Profile';
 import Services from './screens/Services';
 import Marketplace from './screens/Marketplace';
+import Qraccess from './screens/Qr';
 const Tab = createBottomTabNavigator();
 
 export default function App() {
@@ -39,6 +40,9 @@ export default function App() {
                   case 'Services':
                     iconName = focused ? 'construct' : 'construct-outline';
                     break;
+                  case 'QR Access':
+                    iconName = focused ? 'qr-code' : 'qr-code-outline';
+                    break;
                   default:
                     iconName = 'ellipse';
                 }
@@ -59,6 +63,7 @@ export default function App() {
             <Tab.Screen name="HostelHub" component={Home} />
             <Tab.Screen name="Lost and Found" component={LostandFound} />
             <Tab.Screen name="Marketplace" component={Marketplace} />
+            <Tab.Screen name="QR Access" component={Qraccess} />
             <Tab.Screen name="Profile" component={Profile} />
             <Tab.Screen name="Services" component={Services} />
           </Tab.Navigator>

@@ -2,9 +2,10 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
 const mock = {
-  user: { name: 'Alex' },
+  user: { name: 'Krit' },
   stats: {
     leaveBalanceDays: 8,
     leaveTrend: +2,
@@ -43,6 +44,42 @@ function StatCard({ value, unit, title, trend }) {
 export default function Home() {
   const { user, stats } = mock;
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+
+  const actions = [
+    {
+      key: 'apply-leave',
+      title: 'Apply Leave',
+      subtitle: 'Submit a new leave request',
+      icon: 'document-text-outline',
+      color: '#3b82f6',
+      to: 'Services',
+    },
+    {
+      key: 'report-issue',
+      title: 'Report Issue',
+      subtitle: 'File a complaint or issue',
+      icon: 'chatbubble-ellipses-outline',
+      color: '#ef4444',
+      to: 'Services',
+    },
+    {
+      key: 'check-meals',
+      title: 'Check Meals',
+      subtitle: "View today's menu",
+      icon: 'restaurant-outline',
+      color: '#22c55e',
+      to: 'Services',
+    },
+    {
+      key: 'qr-access',
+      title: 'QR Access',
+      subtitle: 'Scan or generate QR codes',
+      icon: 'qr-code-outline',
+      color: '#64748b',
+      to: 'QR Access',
+    },
+  ];
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
@@ -77,6 +114,29 @@ export default function Home() {
         <StatCard value={stats.leaveBalanceDays} unit="days" title="Leave Balance" trend={stats.leaveTrend} />
         <StatCard value={stats.activeComplaints} title="Active Complaints" trend={stats.complaintsTrend} />
         <StatCard value={stats.pollsAvailable} title="Polls Available" trend={stats.pollsTrend} />
+      </View>
+
+      {/* Quick Actions */}
+      <Text style={styles.sectionTitle}>Quick Actions</Text>
+      <View style={styles.actionsGrid}>
+        {actions.map(a => (
+          <TouchableOpacity
+            key={a.key}
+            style={styles.actionCard}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate(a.to)}
+          >
+            <View style={[styles.actionIconWrap, { backgroundColor: a.color + '22' }]}> 
+              <View style={[styles.actionIconInner, { backgroundColor: a.color }]}>
+                <Ionicons name={a.icon} size={18} color="#fff" />
+              </View>
+            </View>
+            <View style={styles.actionTextWrap}>
+              <Text style={styles.actionTitle}>{a.title}</Text>
+              <Text style={styles.actionSubtitle}>{a.subtitle}</Text>
+            </View>
+          </TouchableOpacity>
+        ))}
       </View>
 
       
@@ -206,6 +266,52 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '800',
     color: '#1c1c1e',
+  },
+  actionsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 12,
+    gap: 12,
+  },
+  actionCard: {
+    width: '48%',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#e9e9ed',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+  actionIconWrap: {
+    width: 44,
+    height: 44,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  actionIconInner: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  actionTextWrap: {},
+  actionTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1c1c1e',
+    marginBottom: 2,
+  },
+  actionSubtitle: {
+    fontSize: 12,
+    color: '#6b7280',
   },
   quickGrid: {
     flexDirection: 'row',
