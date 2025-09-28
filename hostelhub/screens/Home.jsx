@@ -80,6 +80,31 @@ export default function Home() {
       to: 'QR Access',
     },
   ];
+  
+  // Mock notifications
+  const notifications = [
+    {
+      id: 'n1',
+      title: 'Leave Request Approved',
+      message: 'Your leave request for March 15-17 has been approved.',
+      time: '2 hours ago',
+      status: 'success', 
+    },
+    {
+      id: 'n2',
+      title: 'Mess Menu Updated',
+      message: 'Vote for next week menu',
+      time: '4 hours ago',
+      status: 'success', 
+    },
+    {
+      id: 'n3',
+      title: 'Hostel Rules',
+      message: 'Hostel rules updated',
+      time: '1 hour ago',
+      status: 'success', 
+    },
+  ];
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
@@ -140,6 +165,38 @@ export default function Home() {
       </View>
 
       
+      {/* Recent Notifications */}
+      <View style={styles.sectionCardWrap}>
+        <View style={styles.sectionHeaderRow}>
+          <Ionicons name="notifications-outline" size={18} color="#1c1c1e" style={{ marginRight: 8 }} />
+          <Text style={styles.sectionHeaderTitle}>Recent Notifications</Text>
+        </View>
+        <Text style={styles.sectionHeaderSubtitle}>
+          Stay updated with the latest announcements and updates
+        </Text>
+
+        {/* Notification List (show 1-3 recent) */}
+        <View style={styles.notificationList}>
+          {notifications.slice(0, 3).map((n) => (
+            <View key={n.id} style={styles.notificationItem}>
+              <View style={styles.notificationTitleRow}>
+                <View
+                  style={[
+                    styles.statusDot,
+                    n.status === 'success' && { backgroundColor: '#22c55e' },
+                    n.status === 'warning' && { backgroundColor: '#f59e0b' },
+                    n.status === 'info' && { backgroundColor: '#3b82f6' },
+                  ]}
+                />
+                <Text style={styles.notificationTitle}>{n.title}</Text>
+              </View>
+              <Text style={styles.notificationMessage}>{n.message}</Text>
+              <Text style={styles.notificationTime}>{n.time}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -310,6 +367,71 @@ const styles = StyleSheet.create({
     marginBottom: 2,
   },
   actionSubtitle: {
+    fontSize: 12,
+    color: '#6b7280',
+  },
+  sectionCardWrap: {
+    marginTop: 16,
+    marginHorizontal: 12,
+    backgroundColor: '#ffffff',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#e9e9ed',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 2,
+  },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  sectionHeaderTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#1c1c1e',
+  },
+  sectionHeaderSubtitle: {
+    fontSize: 13,
+    color: '#6b7280',
+    marginBottom: 10,
+  },
+  notificationList: {
+    gap: 10,
+  },
+  notificationItem: {
+    backgroundColor: '#f3f4f6',
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  notificationTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 999,
+    backgroundColor: '#3b82f6',
+    marginRight: 8,
+  },
+  notificationTitle: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#1c1c1e',
+  },
+  notificationMessage: {
+    fontSize: 13,
+    color: '#374151',
+  },
+  notificationTime: {
+    marginTop: 6,
     fontSize: 12,
     color: '#6b7280',
   },
