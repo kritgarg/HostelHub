@@ -105,6 +105,28 @@ export default function Home() {
       status: 'success', 
     },
   ];
+  
+  // Mock upcoming events
+  const events = [
+    {
+      id: 'e1',
+      title: 'Hostel Meeting',
+      subtitle: 'Monthly residents meeting',
+      meta: 'Tomorrow 6 PM',
+    },
+    {
+      id: 'e2',
+      title: 'Mess Menu Poll',
+      subtitle: "Vote for next week's menu",
+      meta: 'Ends in 2 days',
+    },
+    {
+      id: 'e3',
+      title: 'Cultural Night',
+      subtitle: 'Annual cultural celebration',
+      meta: 'March 25',
+    },
+  ];
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <ScrollView
@@ -192,6 +214,31 @@ export default function Home() {
               </View>
               <Text style={styles.notificationMessage}>{n.message}</Text>
               <Text style={styles.notificationTime}>{n.time}</Text>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Upcoming Events */}
+      <View style={styles.sectionCardWrap}>
+        <View style={styles.sectionHeaderRow}>
+          <Ionicons name="calendar-outline" size={18} color="#1c1c1e" style={{ marginRight: 8 }} />
+          <Text style={styles.sectionHeaderTitle}>Upcoming Events</Text>
+        </View>
+        <Text style={styles.sectionHeaderSubtitle}>
+          Don't miss these important hostel events and announcements
+        </Text>
+
+        <View style={styles.eventList}>
+          {events.map((e) => (
+            <View key={e.id} style={styles.eventItem}>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.eventTitle}>{e.title}</Text>
+                <Text style={styles.eventSubtitle}>{e.subtitle}</Text>
+              </View>
+              <View style={styles.eventMetaPill}>
+                <Text style={styles.eventMetaText}>{e.meta}</Text>
+              </View>
             </View>
           ))}
         </View>
@@ -434,6 +481,43 @@ const styles = StyleSheet.create({
     marginTop: 6,
     fontSize: 12,
     color: '#6b7280',
+  },
+  eventList: {
+    gap: 12,
+  },
+  eventItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    paddingHorizontal: 14,
+    paddingVertical: 14,
+  },
+  eventTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: '#1f2937',
+    marginBottom: 2,
+  },
+  eventSubtitle: {
+    fontSize: 13,
+    color: '#6b7280',
+  },
+  eventMetaPill: {
+    marginLeft: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 999,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+    backgroundColor: '#f9fafb',
+  },
+  eventMetaText: {
+    fontSize: 12,
+    color: '#111827',
+    fontWeight: '700',
   },
   quickGrid: {
     flexDirection: 'row',
