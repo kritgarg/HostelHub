@@ -38,8 +38,8 @@ export default function TabNavigator() {
           }
           return <Ionicons name={iconName} size={22} color={color} />;
         },
-        tabBarActiveTintColor: "#0a84ff",
-        tabBarInactiveTintColor: "#8e8e93",
+        tabBarActiveTintColor: "#7fb069",
+        tabBarInactiveTintColor: "#754F44",
       })}
     >
       <Tab.Screen name="HostelHub" component={Home} />

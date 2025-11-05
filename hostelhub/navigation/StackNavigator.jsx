@@ -21,11 +21,11 @@ export default function StackNavigator() {
     checkOnboarding();
   }, []);
 
-  if (loading) return null; // can show splash screen here
+  if (loading) return null; 
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!seenOnboarding && (
+      {!seenOnboarding || (
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       )}
       <Stack.Screen name="MainApp" component={TabNavigator} />
