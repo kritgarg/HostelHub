@@ -25,7 +25,7 @@ export default function StackNavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      {!seenOnboarding || (
+      {!seenOnboarding && (
         <Stack.Screen name="Onboarding" component={OnboardingScreen} />
       )}
       <Stack.Screen name="MainApp" component={TabNavigator} />

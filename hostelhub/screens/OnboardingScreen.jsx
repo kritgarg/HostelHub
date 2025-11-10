@@ -27,8 +27,8 @@ export default function OnboardingScreen({ navigation }) {
     );
 
     const DoneButton = ({ onPress }) => (
-      <TouchableOpacity onPress={onPress} style={styles.nextButton}>
-        <Text style={styles.nextButtonText}>DONE</Text>
+      <TouchableOpacity onPress={onPress} style={styles.doneButton}>
+        <Text style={styles.doneButtonText}>DONE</Text>
       </TouchableOpacity>
     );
 
@@ -48,9 +48,11 @@ export default function OnboardingScreen({ navigation }) {
         dotStyle={styles.dot}
         activeDotStyle={styles.activeDot}
         bottomBarHeight={100}
+        allowFontScalingButtons={false}
+        transitionAnimationDuration={400}
         pages={[
           {
-            backgroundColor: "#fffbbd",
+            backgroundColor: "#101010",
             image: (
 
               <Image 
@@ -63,7 +65,13 @@ export default function OnboardingScreen({ navigation }) {
             subtitle: "Your all-in-one app for hostel life.",
           },
           {
-            backgroundColor: "#fffbbd",
+            backgroundColor: "#C1DBAD",
+            titleStyles:{
+              color:"black"
+            },
+            subTitleStyles:{
+              color:"black"
+            },
             image: (
               <Image 
                 source={require('../assets/pic2.png')} 
@@ -83,7 +91,7 @@ export default function OnboardingScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fffbbd',
+    backgroundColor: '#fffff',
   },
   onboardingContainer: {
     paddingHorizontal: 20,
@@ -103,15 +111,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 40,
     fontWeight: 'bold',
-    color: '#000000',
     textAlign: 'center',
     marginTop: 1,
     paddingHorizontal: 40,
-    color:"#3c7a4e"
+    color:"#C1DBAD"
   },
   subtitle: {
     fontSize: 20,
-    color: '#3c7a4e',
+    color: '#C1DBAD',
     textAlign: 'center',
     marginBottom: 200,
     marginTop: 15,
@@ -119,15 +126,30 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   nextButton: {
-    backgroundColor: '#3c7a4e',
+    backgroundColor: '#C1DBAD',
     paddingVertical: 15,
     paddingHorizontal: 30,
     borderRadius: 25,
     marginRight: 20,
     marginBottom: 20,
   },
+  doneButton: {
+    backgroundColor: 'black',
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    marginRight: 20,
+    marginBottom: 20,
+  },
+  doneButtonText: {
+    color: '#C1DBAD',
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 16,
+    textTransform: 'uppercase',
+  },
   nextButtonText: {
-    color: 'white',
+    color: 'black',
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
@@ -140,7 +162,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   skipButtonText: {
-    color: '#3c7a4e',
+    color: '#C1DBAD',
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,

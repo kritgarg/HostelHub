@@ -1,12 +1,12 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
-
-import Home from "../screens/Home";
+// import Home from "../screens/Home";
 import LostandFound from "../screens/Landf";
 import Marketplace from "../screens/Marketplace";
 import Profile from "../screens/Profile";
 import Services from "../screens/Services";
+import DrawerNavigator from "./DrawerNavigator"
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +42,7 @@ export default function TabNavigator() {
         tabBarInactiveTintColor: "#754F44",
       })}
     >
-      <Tab.Screen name="HostelHub" component={Home} />
+      <Tab.Screen name="HostelHub" component={DrawerNavigator} />
       <Tab.Screen name="Lost and Found" component={LostandFound} />
       <Tab.Screen name="Marketplace" component={Marketplace} />
       <Tab.Screen name="Profile" component={Profile} />

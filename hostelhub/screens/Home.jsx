@@ -128,27 +128,9 @@ export default function Home() {
     },
   ];
   return (
-    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <ScrollView
-        contentContainerStyle={[styles.container, { paddingBottom: 24 + insets.bottom }]}
-        contentInsetAdjustmentBehavior="automatic"
-      >
-      {/* Top App Bar */}
-      <View style={styles.appBar}>
-        <TouchableOpacity style={styles.menuButton}>
-          <Ionicons name="menu" size={24} color="#1c1c1e" />
-        </TouchableOpacity>
-        <View style={styles.brandWrap}>
-          <View style={styles.brandIconWrap}>
-            <Text style={styles.brandIconText}>H</Text>
-          </View>
-          <Text style={styles.brandText}>HostelHub</Text>
-        </View>
-        <View style={styles.appBarRight}>
-          <Ionicons name="notifications-outline" size={22} color="#1c1c1e" style={{ marginRight: 16 }} />
-          <Ionicons name="person-outline" size={22} color="#1c1c1e" />
-        </View>
-      </View>
+    <SafeAreaView>
+      <ScrollView>
+  
 
       {/* Greeting */}
       <View style={styles.greetingBlock}>
@@ -243,6 +225,8 @@ export default function Home() {
           ))}
         </View>
       </View>
+
+    
 
       </ScrollView>
     </SafeAreaView>
