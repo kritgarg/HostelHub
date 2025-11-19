@@ -14,3 +14,9 @@ export const me = async (req, res) => {
   const user = await AuthService.me(req.user.id);
   res.json(user);
 };
+
+export const assignRole = async (req, res) => {
+  const { userId, role } = req.body;
+  const user = await AuthService.assignRole({ userId, role });
+  res.json(user);
+};

@@ -1,18 +1,15 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // url      = env("DATABASE_URL")
 }
+
+// ====================================
+// ENUMS
+// ====================================
 
 enum Role {
   ADMIN
@@ -20,13 +17,178 @@ enum Role {
   STUDENT
 }
 
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ComplaintStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+}
+
+enum ItemStatus {
+  AVAILABLE
+  SOLD
+}
+
+enum LostFoundType {
+  LOST
+  FOUND
+}
+
+// ====================================
+// USER MODEL
+// ====================================
 
 model User {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String    @unique
-  password   String
-  role       Role      @default(STUDENT)
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String    @unique
+  password  String
+  role      Role      @default(STUDENT)
   roomNumber String?
-  createdAt  DateTime  @default(now())
+  createdAt DateTime  @default(now())
+
+  // Relations
+  leaves        Leave[]
+  complaints    Complaint[]
+  marketplace   MarketplaceItem[]
+  feedback      MessFeedback[]
+  votes         PollVote[]
+  lostfound     LostFound[]
+  notifications Notification[]
+}
+
+// ====================================
+// LEAVE MANAGEMENT
+// ====================================
+
+model Leave {
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  fromDate  DateTime
+  toDate    DateTime
+  reason    String
+  status    LeaveStatus @default(PENDING)
+  qrToken   String?     // QR token (text only)
+  createdAt DateTime    @default(now())
+
+  user      User        @relation(fields: [userId], references: [id])
+}
+
+// ====================================
+// COMPLAINT MODULE (NO PHOTOS)
+// ====================================
+
+model Complaint {
+  id          Int             @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String
+  status      ComplaintStatus @default(PENDING)
+  createdAt   DateTime        @default(now())
+
+  user        User            @relation(fields: [userId], references: [id])
+}
+
+// ====================================
+// MESS MENU + FEEDBACK
+// ====================================
+
+model MessMenu {
+  id        Int      @id @default(autoincrement())
+  day       String   // "Monday", etc.
+  breakfast String
+  lunch     String
+  dinner    String
+  createdAt DateTime @default(now())
+
+  feedbacks MessFeedback[]
+}
+
+model MessFeedback {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  menuId    Int
+  rating    Int      // 1 or -1
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  menu      MessMenu @relation(fields: [menuId], references: [id])
+}
+
+// ====================================
+// MARKETPLACE (NO IMAGES)
+// ====================================
+
+model MarketplaceItem {
+  id          Int         @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String
+  price       Float
+  status      ItemStatus  @default(AVAILABLE)
+  createdAt   DateTime    @default(now())
+
+  user        User        @relation(fields: [userId], references: [id])
+}
+
+// ====================================
+// POLLS AND VOTES
+// ====================================
+
+model Poll {
+  id        Int       @id @default(autoincrement())
+  question  String
+  options   Json      // ["Option A","Option B"]
+  createdBy Int
+  createdAt DateTime  @default(now())
+
+  votes     PollVote[]
+}
+
+model PollVote {
+  id        Int      @id @default(autoincrement())
+  pollId    Int
+  userId    Int
+  option    String
+  createdAt DateTime @default(now())
+
+  poll      Poll     @relation(fields: [pollId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+// ====================================
+// LOST & FOUND (NO IMAGES)
+// ====================================
+
+model LostFound {
+  id          Int            @id @default(autoincrement())
+  userId      Int
+  type        LostFoundType
+  title       String
+  description String
+  location    String
+  resolved    Boolean        @default(false)
+  createdAt   DateTime       @default(now())
+
+  user        User           @relation(fields: [userId], references: [id])
+}
+
+// ====================================
+// NOTIFICATIONS
+// ====================================
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  title     String
+  message   String
+  read      Boolean   @default(false)
+  createdAt DateTime  @default(now())
+
+  user      User      @relation(fields: [userId], references: [id])
 }
