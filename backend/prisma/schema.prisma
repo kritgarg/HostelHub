@@ -73,11 +73,11 @@ model Leave {
   toDate    DateTime
   reason    String
   status    LeaveStatus @default(PENDING)
-  qrToken   String?     // QR token (text only)
   createdAt DateTime    @default(now())
 
   user      User        @relation(fields: [userId], references: [id])
 }
+
 
 // ====================================
 // COMPLAINT MODULE (NO PHOTOS)
