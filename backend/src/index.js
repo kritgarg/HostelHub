@@ -5,6 +5,8 @@ import authRoutes from "./modules/auth/auth.routes.js";
 import usersRoutes from "./modules/users/users.routes.js";
 import leaveRoutes from "./modules/leave/leave.routes.js";
 import complaintsRoutes from "./modules/complaints/complaints.routes.js";
+import messRoutes from "./modules/mess/mess.routes.js";
+import marketplaceRoutes from "./modules/marketplace/marketplace.routes.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { prisma } from "./config/db.js";
 
@@ -18,6 +20,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/leave", leaveRoutes);
 app.use("/api/complaints", complaintsRoutes);
+app.use("/api/mess", messRoutes);
+app.use("/api/marketplace", marketplaceRoutes);
 // add rest
 
 app.use(errorHandler);
