@@ -17,7 +17,14 @@ import { role } from "./middlewares/role.js";
 
 const app = express();
 
-app.use(cors());
+// Enable CORS with more permissive settings for development
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 // ROUTES
