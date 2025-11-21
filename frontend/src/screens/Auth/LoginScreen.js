@@ -21,12 +21,19 @@ export default function LoginScreen({ navigation }) {
   const [submitting, setSubmitting] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) return alert("Please fill in all fields");
+    if (!email || !password) {
+      return alert("Please fill in all fields");
+    }
+    
     try {
       setSubmitting(true);
-      await login(email, password);
-    } catch (e) {
-      alert("Login failed");
+      const result = await login(email, password);
+      
+      if (!result.success) {
+        alert(result.error || 'Login failed. Please try again.');
+      }
+    } catch (error) {
+      alert(error.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setSubmitting(false);
     }

@@ -12,8 +12,10 @@ import {
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
-import { register as registerApi } from "../../api/auth";
+import { register as registerApi, getMe } from "../../api/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthContext } from "../../context/AuthContext";
+import { setUser } from "../../context/AuthContext";
 
 export default function RegisterScreen({ navigation }) {
   const { login } = useContext(AuthContext);
@@ -30,13 +32,60 @@ export default function RegisterScreen({ navigation }) {
     if (password !== confirmPassword) {
       return alert("Passwords don't match");
     }
+    
     try {
       setSubmitting(true);
-      await registerApi({ name, email, password });
-      // auto login after successful register
-      await login(email, password);
-    } catch (e) {
-      alert("Registration failed");
+      console.log('Attempting to register with:', { name, email });
+      
+      // Make the registration API call
+      const response = await registerApi({ name, email, password });
+      console.log('Registration response:', JSON.stringify(response, null, 2));
+      
+      // Check if registration was successful
+      if (!response || !response.data) {
+        throw new Error('Invalid response from server');
+      }
+      
+      // Try to extract token from different possible response structures
+      let token;
+      if (response.data.token) {
+        token = response.data.token;
+      } else if (response.data.data && response.data.data.token) {
+        token = response.data.data.token;
+      }
+      
+      if (token) {
+        console.log('Token found in registration response, saving...');
+        await AsyncStorage.setItem("token", token);
+        
+        // Get user data
+        console.log('Fetching user data after registration...');
+        const me = await getMe();
+        console.log('User data after registration:', JSON.stringify(me, null, 2));
+        
+        let userData = me?.data?.data || me?.data;
+        if (userData) {
+          setUser(userData);
+          alert('Registration successful! You are now logged in.');
+          return { success: true };
+        }
+      }
+      
+      // If auto-login with token didn't work, try traditional login
+      console.log('Attempting traditional login after registration...');
+      const loginResult = await login(email, password);
+      if (!loginResult.success) {
+        throw new Error(loginResult.error || 'Registration successful but failed to log in. Please try logging in manually.');
+      }
+      
+      alert('Registration successful! You are now logged in.');
+      return { success: true };
+      
+    } catch (error) {
+      console.error('Registration error:', error);
+      const errorMessage = error.response?.data?.message || error.message || 'Registration failed. Please try again.';
+      alert(`Registration failed: ${errorMessage}`);
+      return { success: false, error: errorMessage };
     } finally {
       setSubmitting(false);
     }

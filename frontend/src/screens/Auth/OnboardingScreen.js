@@ -1,32 +1,54 @@
 import React from "react";
 import Onboarding from "react-native-onboarding-swiper";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import { Image, View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 
-export default function OnboardingScreen({ navigation }) {
-  
-  const finishOnboarding = async () => {
-    await AsyncStorage.setItem("hasSeenOnboarding", "true");
-    navigation.replace("Login"); // Navigate to Login screen
+export default function OnboardingScreen({ onComplete }) {
+
+  const finishOnboarding = () => {
+    if (onComplete) onComplete();
   };
 
-  // Custom buttons
-  const NextButton = ({ onPress }) => (
-    <TouchableOpacity onPress={onPress} style={styles.nextButton}>
+  const NextButton = (props) => (
+    <TouchableOpacity
+      style={[styles.nextButton, props.style]}
+      onPress={props.onPress}
+      disabled={props.disabled}
+      activeOpacity={0.8}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      accessibilityRole="button"
+      accessibilityLabel="Next"
+    >
       <Text style={styles.nextButtonText}>NEXT</Text>
     </TouchableOpacity>
   );
 
-  const SkipButton = ({ onPress }) => (
-    <TouchableOpacity onPress={onPress} style={styles.skipButton}>
+  const SkipButton = (props) => (
+    <TouchableOpacity
+      style={[styles.skipButton, props.style]}
+      onPress={props.onPress}
+      disabled={props.disabled}
+      activeOpacity={0.8}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      accessibilityRole="button"
+      accessibilityLabel="Skip"
+    >
       <Text style={styles.skipButtonText}>SKIP</Text>
     </TouchableOpacity>
   );
 
-  const DoneButton = ({ onPress }) => (
-    <TouchableOpacity onPress={onPress} style={styles.doneButton}>
+  const DoneButton = (props) => (
+    <TouchableOpacity
+      style={[styles.doneButton, props.style]}
+      onPress={props.onPress}
+      disabled={props.disabled}
+      activeOpacity={0.8}
+      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      accessibilityRole="button"
+      accessibilityLabel="Done"
+    >
       <Text style={styles.doneButtonText}>DONE</Text>
     </TouchableOpacity>
   );
@@ -37,6 +59,8 @@ export default function OnboardingScreen({ navigation }) {
         bottomBarHighlight={false}
         onSkip={finishOnboarding}
         onDone={finishOnboarding}
+        showSkip
+        showDone
         DoneButtonComponent={DoneButton}
         NextButtonComponent={NextButton}
         SkipButtonComponent={SkipButton}
@@ -47,8 +71,6 @@ export default function OnboardingScreen({ navigation }) {
         dotStyle={styles.dot}
         activeDotStyle={styles.activeDot}
         bottomBarHeight={100}
-        allowFontScalingButtons={false}
-        transitionAnimationDuration={400}
         pages={[
           {
             backgroundColor: "#101010",
@@ -64,12 +86,8 @@ export default function OnboardingScreen({ navigation }) {
           },
           {
             backgroundColor: "#C1DBAD",
-            titleStyles: {
-              color: "black",
-            },
-            subTitleStyles: {
-              color: "black",
-            },
+            titleStyles: { color: "black" },
+            subTitleStyles: { color: "black" },
             image: (
               <Image
                 source={require("../../../assets/pic2.png")}
@@ -87,19 +105,12 @@ export default function OnboardingScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffffff",
-  },
-  onboardingContainer: {
-    paddingHorizontal: 20,
-  },
+  container: { flex: 1, backgroundColor: "#ffffff" },
+  onboardingContainer: { paddingHorizontal: 20 },
   imageContainer: {
-    paddingBottom: 0,
-    marginBottom: 0,
+    paddingTop: 90,
     flex: 1,
     justifyContent: "center",
-    paddingTop: 90,
   },
   image: {
     width: width * 0.8,
@@ -110,9 +121,8 @@ const styles = StyleSheet.create({
     fontSize: 40,
     fontWeight: "bold",
     textAlign: "center",
-    paddingHorizontal: 40,
-    marginTop: 1,
     color: "#C1DBAD",
+    paddingHorizontal: 40,
   },
   subtitle: {
     fontSize: 20,
@@ -121,7 +131,6 @@ const styles = StyleSheet.create({
     marginTop: 15,
     marginBottom: 200,
     paddingHorizontal: 40,
-    lineHeight: 24,
   },
   nextButton: {
     backgroundColor: "#C1DBAD",
@@ -131,12 +140,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginBottom: 20,
   },
-  nextButtonText: {
-    color: "black",
-    fontWeight: "bold",
-    fontSize: 16,
-    textTransform: "uppercase",
-  },
+  nextButtonText: { color: "black", fontWeight: "bold", fontSize: 16 },
   doneButton: {
     backgroundColor: "black",
     paddingVertical: 15,
@@ -145,24 +149,14 @@ const styles = StyleSheet.create({
     marginRight: 20,
     marginBottom: 20,
   },
-  doneButtonText: {
-    color: "#C1DBAD",
-    fontWeight: "bold",
-    fontSize: 16,
-    textTransform: "uppercase",
-  },
+  doneButtonText: { color: "#C1DBAD", fontWeight: "bold", fontSize: 16 },
   skipButton: {
     paddingVertical: 15,
     paddingHorizontal: 30,
     marginLeft: 20,
     marginBottom: 20,
   },
-  skipButtonText: {
-    color: "#C1DBAD",
-    fontWeight: "bold",
-    fontSize: 16,
-    textTransform: "uppercase",
-  },
+  skipButtonText: { color: "#C1DBAD", fontWeight: "bold", fontSize: 16 },
   dot: {
     backgroundColor: "rgba(0, 0, 0, 0.2)",
     width: 10,
@@ -175,6 +169,5 @@ const styles = StyleSheet.create({
     width: 30,
     height: 10,
     borderRadius: 5,
-    marginHorizontal: 5,
   },
 });
