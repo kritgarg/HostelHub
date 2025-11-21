@@ -53,3 +53,21 @@ export const getComplaintById = async (req, res) => {
   }
   res.json(complaint);
 };
+
+export const deleteComplaint = async (req, res) => {
+  const id = Number(req.params.id);
+  const requester = req.user;
+  const complaint = await ComplaintsService.getComplaintById({ id });
+  if (!complaint) {
+    const e = new Error("Complaint not found");
+    e.status = 404;
+    throw e;
+  }
+  if (requester.role === "STUDENT" && complaint.userId !== requester.id) {
+    const e = new Error("Forbidden");
+    e.status = 403;
+    throw e;
+  }
+  const deleted = await ComplaintsService.deleteComplaint({ id });
+  res.json(deleted);
+};

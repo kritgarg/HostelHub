@@ -7,6 +7,7 @@ import {
   listComplaints,
   updateComplaint,
   getComplaintById,
+  deleteComplaint,
 } from "./complaints.controller.js";
 
 const router = Router();
@@ -21,5 +22,6 @@ router.put("/update/:id", auth, role("WARDEN", "ADMIN"), updateComplaint);
 
 // owner, warden, admin
 router.get("/:id", auth, getComplaintById);
+router.delete("/:id", auth, role("STUDENT", "WARDEN", "ADMIN"), deleteComplaint);
 
 export default router;

@@ -95,3 +95,7 @@ export const getComplaintById = async ({ id }) => {
     },
   });
 };
+
+export const deleteComplaint = async ({ id }) => {
+  return prisma.complaint.delete({ where: { id: Number(id) }, select: { id: true } });
+};
