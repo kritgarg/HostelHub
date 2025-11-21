@@ -23,7 +23,7 @@ router.get("/item/:id", getItemById);
 router.put("/item/:id", auth, role("STUDENT"), updateItem);
 router.put("/item/:id/mark-sold", auth, role("STUDENT"), markSold);
 
-// Owner or admin delete
-router.delete("/item/:id", auth, role("STUDENT", "ADMIN"), deleteItem);
+// Owner or warden delete
+router.delete("/item/:id", auth, role("STUDENT","WARDEN"), deleteItem);
 
 export default router;

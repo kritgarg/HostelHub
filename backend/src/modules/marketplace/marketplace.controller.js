@@ -13,11 +13,12 @@ export const createItem = async (req, res) => {
 };
 
 export const listItems = async (req, res) => {
-  const { search, minPrice, maxPrice, page = 1, limit = 20 } = req.query;
+  const { search, minPrice, maxPrice, status, page = 1, limit = 20 } = req.query;
   const data = await MarketplaceService.listItems({
     search,
     minPrice: minPrice !== undefined ? Number(minPrice) : undefined,
     maxPrice: maxPrice !== undefined ? Number(maxPrice) : undefined,
+    status,
     page: Number(page),
     limit: Number(limit),
   });
@@ -63,7 +64,7 @@ export const deleteItem = async (req, res) => {
     e.status = 404;
     throw e;
   }
-  if (item.userId !== requester.id && requester.role !== "ADMIN") {
+  if (item.userId !== requester.id && !["ADMIN", "WARDEN"].includes(requester.role)) {
     const e = new Error("Forbidden");
     e.status = 403;
     throw e;

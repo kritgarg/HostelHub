@@ -9,7 +9,7 @@ import ManageComplaintsScreen from "../screens/Warden/ManageComplaintsScreen";
 import MessMenuManageScreen from "../screens/Warden/MessMenuManageScreen";
 import PollsManageScreen from "../screens/Warden/PollsManageScreen";
 import WardenNotificationsScreen from "../screens/Warden/WardenNotificationsScreen";
-import MarketplaceScreen from "../screens/Student/MarketplaceScreen";
+import WardenMarketplaceScreen from "../screens/Warden/WardenMarketplaceScreen";
 import LostFoundScreen from "../screens/Student/LostFoundScreen";
 import UserRolesManageScreen from "../screens/Warden/UserRolesManageScreen";
 const Tab = createBottomTabNavigator();
@@ -24,7 +24,7 @@ function HomeStack() {
       <Stack.Screen name="MessMenu" component={MessMenuManageScreen} />
       <Stack.Screen name="Polls" component={PollsManageScreen} />
       <Stack.Screen name="Notifications" component={WardenNotificationsScreen} />
-      <Stack.Screen name="Marketplace" component={MarketplaceScreen} />
+      <Stack.Screen name="Marketplace" component={WardenMarketplaceScreen} />
       <Stack.Screen name="LostFound" component={LostFoundScreen} />
       <Stack.Screen name="UserRoles" component={UserRolesManageScreen} />
     </Stack.Navigator>

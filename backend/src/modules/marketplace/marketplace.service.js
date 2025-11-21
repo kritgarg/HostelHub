@@ -7,9 +7,9 @@ export const createItem = async ({ userId, title, description, price }) => {
   });
 };
 
-export const listItems = async ({ search, minPrice, maxPrice, page = 1, limit = 20 }) => {
+export const listItems = async ({ search, minPrice, maxPrice, status, page = 1, limit = 20 }) => {
   const where = {
-    status: "AVAILABLE",
+    ...(status ? { status } : {}),
     ...(search
       ? {
           OR: [
@@ -34,7 +34,16 @@ export const listItems = async ({ search, minPrice, maxPrice, page = 1, limit = 
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * limit,
       take: limit,
-      select: { id: true, userId: true, title: true, description: true, price: true, status: true, createdAt: true },
+      select: {
+        id: true,
+        userId: true,
+        title: true,
+        description: true,
+        price: true,
+        status: true,
+        createdAt: true,
+        user: { select: { id: true, name: true } },
+      },
     }),
     prisma.marketplaceItem.count({ where }),
   ]);
@@ -45,7 +54,7 @@ export const listItems = async ({ search, minPrice, maxPrice, page = 1, limit = 
 export const getItemById = async ({ id }) => {
   return prisma.marketplaceItem.findUnique({
     where: { id: Number(id) },
-    select: { id: true, userId: true, title: true, description: true, price: true, status: true, createdAt: true },
+    select: { id: true, userId: true, title: true, description: true, price: true, status: true, createdAt: true, user: { select: { id: true, name: true } } },
   });
 };
 
@@ -58,7 +67,7 @@ export const updateItem = async ({ id, title, description, price, status }) => {
   return prisma.marketplaceItem.update({
     where: { id: Number(id) },
     data,
-    select: { id: true, userId: true, title: true, description: true, price: true, status: true, createdAt: true },
+    select: { id: true, userId: true, title: true, description: true, price: true, status: true, createdAt: true, user: { select: { id: true, name: true } } },
   });
 };
 
@@ -70,7 +79,7 @@ export const markSold = async ({ id }) => {
   return prisma.marketplaceItem.update({
     where: { id: Number(id) },
     data: { status: "SOLD" },
-    select: { id: true, userId: true, title: true, description: true, price: true, status: true, createdAt: true },
+    select: { id: true, userId: true, title: true, description: true, price: true, status: true, createdAt: true, user: { select: { id: true, name: true } } },
   });
 };
 
