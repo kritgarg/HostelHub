@@ -1,5 +1,11 @@
 import * as UsersService from "./users.service.js";
 
+export const listUsers = async (req, res) => {
+  const { role, search, page = 1, limit = 20 } = req.query;
+  const data = await UsersService.listUsers({ role, search, page: Number(page), limit: Number(limit) });
+  res.json(data);
+};
+
 // PATCH /api/users/me
 // Body can include: { name?, oldPassword?, newPassword? }
 export const updateMe = async (req, res) => {

@@ -24,6 +24,12 @@ export const me = async (req, res) => {
 
 export const assignRole = async (req, res) => {
   const { userId, role } = req.body;
+  const requesterId = req.user.id;
+  if (Number(userId) === Number(requesterId)) {
+    const e = new Error("You cannot change your own role");
+    e.status = 403;
+    throw e;
+  }
   const user = await AuthService.assignRole({ userId, role });
   res.json(user);
 };

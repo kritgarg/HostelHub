@@ -8,6 +8,6 @@ const router = Router();
 router.post("/register", register);
 router.post("/login", login);
 router.get("/me", auth, me);
-router.post("/assign-role", auth, role("ADMIN"), assignRole);
+router.post("/assign-role", auth, role("WARDEN", "ADMIN"), assignRole);
 
 export default router;

@@ -10,7 +10,7 @@ import MessMenuManageScreen from "../screens/Warden/MessMenuManageScreen";
 import PollsManageScreen from "../screens/Warden/PollsManageScreen";
 import WardenNotificationsScreen from "../screens/Warden/WardenNotificationsScreen";
 import WardenMarketplaceScreen from "../screens/Warden/WardenMarketplaceScreen";
-import LostFoundScreen from "../screens/Student/LostFoundScreen";
+import WardenLostFoundScreen from "../screens/Warden/WardenLostFoundScreen";
 import UserRolesManageScreen from "../screens/Warden/UserRolesManageScreen";
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -25,7 +25,7 @@ function HomeStack() {
       <Stack.Screen name="Polls" component={PollsManageScreen} />
       <Stack.Screen name="Notifications" component={WardenNotificationsScreen} />
       <Stack.Screen name="Marketplace" component={WardenMarketplaceScreen} />
-      <Stack.Screen name="LostFound" component={LostFoundScreen} />
+      <Stack.Screen name="LostFound" component={WardenLostFoundScreen} />
       <Stack.Screen name="UserRoles" component={UserRolesManageScreen} />
     </Stack.Navigator>
   );

@@ -78,3 +78,7 @@ export const getById = async ({ id }) => {
   });
 };
 
+export const remove = async ({ id }) => {
+  return prisma.lostFound.delete({ where: { id: Number(id) }, select: { id: true } });
+};
+

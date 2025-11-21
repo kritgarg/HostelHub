@@ -28,6 +28,7 @@ export default function WardenHomeScreen({ navigation }) {
             icon="arrow-forward"
             onPress={() => navigation.navigate("Polls")}
             image={require("../../../assets/polls.png")}
+            imageStyle={styles.tileImagePolls}
           />
           <Tile
             color="#f5cf6a"
@@ -57,18 +58,24 @@ export default function WardenHomeScreen({ navigation }) {
             label="Notifications"
             icon="arrow-forward"
             onPress={() => navigation.navigate("Notifications")}
+            image={require("../../../assets/notifications.png")}
+            imageStyle={styles.notifications}
           />
           <Tile
             color="#cde6ff"
             label="Marketplace"
             icon="arrow-forward"
             onPress={() => navigation.navigate("Marketplace")}
+            image={require("../../../assets/marketplace.png")}
+            imageStyle={styles.marketplace}
           />
           <Tile
             color="#e9d7ff"
             label="Lost & Found"
             icon="arrow-forward"
             onPress={() => navigation.navigate("LostFound")}
+            image={require("../../../assets/lostfound.png")}
+            imageStyle={styles.lostfound}
           />
           <Tile
             color="#d1f7c4"
@@ -171,10 +178,10 @@ const styles = StyleSheet.create({
     fontWeight: "700" 
   },
   tileImageUsers: {
-    left: 10,
-    bottom:-25,
+    left: 15,
+    top: 25,
     width: 150,
-    height: 170,
+    height: 150,
     opacity: 0.8,
   },
   tileIcon: {
@@ -188,9 +195,17 @@ const styles = StyleSheet.create({
   },
   tileImage: {
     position: "absolute",
-    bottom: 10,
+    top: 6,
+    left: 5,
     width: 170,
     height: 170,
+    opacity: 0.9,
+  },
+  tileImagePolls: {
+    position: "absolute",
+    top: 20,
+    width: 160,
+    height: 160,
     opacity: 0.9,
   },
   tileImageMess: {
@@ -201,8 +216,32 @@ const styles = StyleSheet.create({
     opacity: 1,
   },
   complaints: {
-    width: 170,
-    height: 140,
-    opacity: 1,
+    position: "absolute",
+    top:20,
+    left: 14,
+    width: 165,
+    height: 165,
+    opacity: 0.95,
+  },
+  notifications: {
+    position: "absolute",
+    top: 14,
+    width: 160,
+    height: 170,
+    opacity: 0.95,
+  },
+  marketplace: {
+    position: "absolute",
+    top: 27,
+    left: 10,
+    width: 160,
+    height: 160,
+    opacity: 0.95,
+  },
+  lostfound: {
+    top: 14,
+    width: 165,
+    height: 165,
+    opacity: 0.95,
   },
 });

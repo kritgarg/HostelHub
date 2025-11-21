@@ -1,6 +1,31 @@
 import { prisma } from "../../config/db.js";
 import bcrypt from "bcrypt";
 
+export const listUsers = async ({ role, search, page = 1, limit = 20 }) => {
+  const where = {
+    ...(role ? { role } : {}),
+    ...(search
+      ? {
+          OR: [
+            { name: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
+  const [items, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      orderBy: { createdAt: "desc" },
+      skip: (page - 1) * limit,
+      take: limit,
+      select: { id: true, name: true, email: true, role: true, createdAt: true },
+    }),
+    prisma.user.count({ where }),
+  ]);
+  return { items, total, page, limit };
+};
+
 export const updateMe = async ({ userId, name, oldPassword, newPassword }) => {
   const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
   if (!user) throw new Error("User not found");

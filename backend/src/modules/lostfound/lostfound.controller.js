@@ -52,3 +52,21 @@ export const getById = async (req, res) => {
   res.json(item);
 };
 
+export const remove = async (req, res) => {
+  const id = Number(req.params.id);
+  const requester = req.user;
+  const item = await LostFoundService.getById({ id });
+  if (!item) {
+    const e = new Error("Record not found");
+    e.status = 404;
+    throw e;
+  }
+  if (item.userId !== requester.id && requester.role !== "WARDEN") {
+    const e = new Error("Forbidden");
+    e.status = 403;
+    throw e;
+  }
+  await LostFoundService.remove({ id });
+  res.json({ id });
+};
+
