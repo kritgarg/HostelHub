@@ -1,7 +1,7 @@
 import React from "react";
 import Onboarding from "react-native-onboarding-swiper";
-
 import { Image, View, Text, StyleSheet, TouchableOpacity, Dimensions } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -11,92 +11,116 @@ export default function OnboardingScreen({ onComplete }) {
     if (onComplete) onComplete();
   };
 
-  const NextButton = (props) => (
+  const NextButton = ({ ...props }) => (
     <TouchableOpacity
-      style={[styles.nextButton, props.style]}
-      onPress={props.onPress}
-      disabled={props.disabled}
+      style={styles.button}
+      {...props}
       activeOpacity={0.8}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      accessibilityRole="button"
-      accessibilityLabel="Next"
     >
-      <Text style={styles.nextButtonText}>NEXT</Text>
+      <Ionicons name="arrow-forward" size={24} color="#fff" />
     </TouchableOpacity>
   );
 
-  const SkipButton = (props) => (
+  const SkipButton = ({ ...props }) => (
     <TouchableOpacity
-      style={[styles.skipButton, props.style]}
-      onPress={props.onPress}
-      disabled={props.disabled}
+      style={styles.skipButton}
+      {...props}
       activeOpacity={0.8}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      accessibilityRole="button"
-      accessibilityLabel="Skip"
     >
-      <Text style={styles.skipButtonText}>SKIP</Text>
+      <Text style={styles.skipText}>Skip</Text>
     </TouchableOpacity>
   );
 
-  const DoneButton = (props) => (
+  const DoneButton = ({ ...props }) => (
     <TouchableOpacity
-      style={[styles.doneButton, props.style]}
-      onPress={props.onPress}
-      disabled={props.disabled}
+      style={styles.doneButton}
+      {...props}
       activeOpacity={0.8}
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      accessibilityRole="button"
-      accessibilityLabel="Done"
     >
-      <Text style={styles.doneButtonText}>DONE</Text>
+      <Text style={styles.doneText}>Get Started</Text>
+      <Ionicons name="rocket-outline" size={20} color="#fff" style={{ marginLeft: 8 }} />
     </TouchableOpacity>
   );
+
+  const Square = ({ isLight, selected }) => {
+    let backgroundColor;
+    if (isLight) {
+      backgroundColor = selected ? "rgba(0, 0, 0, 0.8)" : "rgba(0, 0, 0, 0.3)";
+    } else {
+      backgroundColor = selected ? "#fff" : "rgba(255, 255, 255, 0.5)";
+    }
+    return (
+      <View
+        style={{
+          width: selected ? 20 : 8,
+          height: 8,
+          marginHorizontal: 3,
+          backgroundColor,
+          borderRadius: 4,
+          transition: "all 0.3s",
+        }}
+      />
+    );
+  };
 
   return (
     <View style={styles.container}>
       <Onboarding
-        bottomBarHighlight={false}
         onSkip={finishOnboarding}
         onDone={finishOnboarding}
-        showSkip
-        showDone
-        DoneButtonComponent={DoneButton}
+        DotComponent={Square}
         NextButtonComponent={NextButton}
         SkipButtonComponent={SkipButton}
+        DoneButtonComponent={DoneButton}
         titleStyles={styles.title}
         subTitleStyles={styles.subtitle}
         imageContainerStyles={styles.imageContainer}
         containerStyles={styles.onboardingContainer}
-        dotStyle={styles.dot}
-        activeDotStyle={styles.activeDot}
-        bottomBarHeight={100}
+        bottomBarHeight={80}
+        bottomBarHighlight={false}
         pages={[
           {
-            backgroundColor: "#101010",
+            backgroundColor: "#f2f0e7",
             image: (
-              <Image
-                source={require("../../../assets/pic1.png")}
-                style={styles.image}
-                resizeMode="contain"
-              />
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={require("../../../assets/pic1.png")}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+              </View>
             ),
             title: "Welcome to HostelHub",
-            subtitle: "Your all-in-one app for hostel life.",
+            subtitle: "Your ultimate companion for a seamless hostel life.",
           },
           {
-            backgroundColor: "#C1DBAD",
-            titleStyles: { color: "black" },
-            subTitleStyles: { color: "black" },
+            backgroundColor: "#e3f2fd", // Light Blue
             image: (
-              <Image
-                source={require("../../../assets/pic2.png")}
-                style={styles.image}
-                resizeMode="contain"
-              />
+              <View style={styles.imageWrapper}>
+                <Image
+                  source={require("../../../assets/pic2.png")}
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+              </View>
             ),
-            title: "Get Started",
-            subtitle: "Marketplace & Services — all in one place!",
+            title: "Stay Connected",
+            subtitle: "Notices, Polls, and Complaints - all in one place.",
+          },
+          {
+            backgroundColor: "#fff3e0", // Light Orange
+            image: (
+              <View style={styles.imageWrapper}>
+                {/* Placeholder for 3rd image, reusing pic1 or pic2 if pic3 doesn't exist yet */}
+                <Image
+                  source={require("../../../assets/pic1.png")} 
+                  style={styles.image}
+                  resizeMode="contain"
+                />
+              </View>
+            ),
+            title: "Easy Living",
+            subtitle: "Apply for leaves, check mess menu, and more!",
           },
         ]}
       />
@@ -105,69 +129,67 @@ export default function OnboardingScreen({ onComplete }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#ffffff" },
-  onboardingContainer: { paddingHorizontal: 20 },
+  container: { flex: 1 },
+  onboardingContainer: { paddingBottom: 40 },
   imageContainer: {
-    paddingTop: 90,
-    flex: 1,
-    justifyContent: "center",
+    paddingBottom: 20,
+  },
+  imageWrapper: {
+    width: width * 0.8,
+    height: width * 0.8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.5)',
+    borderRadius: width * 0.4,
+    marginBottom: 20,
   },
   image: {
-    width: width * 0.8,
-    height: height * 0.35,
-    alignSelf: "center",
+    width: width * 0.7,
+    height: width * 0.7,
   },
   title: {
-    fontSize: 40,
-    fontWeight: "bold",
+    fontSize: 28,
+    fontWeight: "800",
+    color: "#111",
+    marginBottom: 10,
     textAlign: "center",
-    color: "#C1DBAD",
-    paddingHorizontal: 40,
   },
   subtitle: {
-    fontSize: 20,
-    color: "#C1DBAD",
+    fontSize: 16,
+    color: "#666",
     textAlign: "center",
-    marginTop: 15,
-    marginBottom: 200,
     paddingHorizontal: 40,
+    lineHeight: 24,
   },
-  nextButton: {
-    backgroundColor: "#C1DBAD",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 25,
+  button: {
     marginRight: 20,
-    marginBottom: 20,
-  },
-  nextButtonText: { color: "black", fontWeight: "bold", fontSize: 16 },
-  doneButton: {
-    backgroundColor: "black",
-    paddingVertical: 15,
-    paddingHorizontal: 30,
+    width: 50,
+    height: 50,
     borderRadius: 25,
-    marginRight: 20,
-    marginBottom: 20,
+    backgroundColor: "#111",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  doneButtonText: { color: "#C1DBAD", fontWeight: "bold", fontSize: 16 },
   skipButton: {
-    paddingVertical: 15,
-    paddingHorizontal: 30,
     marginLeft: 20,
-    marginBottom: 20,
   },
-  skipButtonText: { color: "#C1DBAD", fontWeight: "bold", fontSize: 16 },
-  dot: {
-    backgroundColor: "rgba(0, 0, 0, 0.2)",
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginHorizontal: 5,
+  skipText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#666",
   },
-  activeDot: {
-    backgroundColor: "#7FB069",
-    width: 30,
-    height: 10,
-    borderRadius: 5,
+  doneButton: {
+    marginRight: 20,
+    flexDirection: "row",
+    backgroundColor: "#111",
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 25,
+    alignItems: "center",
+  },
+  doneText: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
   },
 });

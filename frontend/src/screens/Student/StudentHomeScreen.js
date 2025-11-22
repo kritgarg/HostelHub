@@ -1,11 +1,27 @@
-import React, { useContext } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert, FlatList } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, Alert, FlatList, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../../context/AuthContext";
+import API from "../../api/api";
 import Tile from "../../components/Tile";
+import { Ionicons } from "@expo/vector-icons";
 
 export default function StudentHomeScreen({ navigation }) {
   const { user } = useContext(AuthContext);
+  const [stats, setStats] = useState({ pendingLeaves: 0, activeComplaints: 0, activePolls: 0 });
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await API.get("/users/stats");
+      setStats(res.data);
+    } catch (err) {
+      console.log("Error fetching stats:", err);
+    }
+  };
 
   const tilesData = [
     {
@@ -106,6 +122,59 @@ export default function StudentHomeScreen({ navigation }) {
             <Text style={styles.heroInputText}>Leave status, complaints...</Text>
           </View>
         </View>
+
+        {/* Stats Section */}
+        <Text style={styles.sectionTitle}>Here's what's happening today</Text>
+        <View style={styles.statsContainer}>
+          <TouchableOpacity style={styles.statCard} onPress={() => navigation.navigate("My Leaves")}>
+            <View style={styles.statRow}>
+              <View style={[styles.iconContainer, { backgroundColor: "#E8F0FE" }]}>
+                <Ionicons name="calendar-outline" size={24} color="#4285F4" />
+              </View>
+              <View style={styles.statTextContainer}>
+                <Text style={styles.statLabel}>Pending Leaves</Text>
+                <Text style={[styles.statNumber, { color: "#4285F4" }]}>{stats.pendingLeaves}</Text>
+              </View>
+              <View style={[styles.trendPill, { backgroundColor: "#E8F0FE" }]}>
+                <Ionicons name="trending-up" size={14} color="#4285F4" />
+                <Text style={[styles.trendText, { color: "#4285F4" }]}>Active</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.statCard} onPress={() => navigation.navigate("Complaints")}>
+            <View style={styles.statRow}>
+              <View style={[styles.iconContainer, { backgroundColor: "#FCE8E6" }]}>
+                <Ionicons name="alert-circle-outline" size={24} color="#EA4335" />
+              </View>
+              <View style={styles.statTextContainer}>
+                <Text style={styles.statLabel}>Active Complaints</Text>
+                <Text style={[styles.statNumber, { color: "#EA4335" }]}>{stats.activeComplaints}</Text>
+              </View>
+              <View style={[styles.trendPill, { backgroundColor: "#FCE8E6" }]}>
+                <Ionicons name="alert-circle" size={14} color="#EA4335" />
+                <Text style={[styles.trendText, { color: "#EA4335" }]}>Open</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.statCard} onPress={() => navigation.navigate("Polls")}>
+            <View style={styles.statRow}>
+              <View style={[styles.iconContainer, { backgroundColor: "#E6F4EA" }]}>
+                <Ionicons name="bar-chart-outline" size={24} color="#34A853" />
+              </View>
+              <View style={styles.statTextContainer}>
+                <Text style={styles.statLabel}>Polls Available</Text>
+                <Text style={[styles.statNumber, { color: "#34A853" }]}>{stats.activePolls}</Text>
+              </View>
+              <View style={[styles.trendPill, { backgroundColor: "#E6F4EA" }]}>
+                <Ionicons name="bar-chart" size={14} color="#34A853" />
+                <Text style={[styles.trendText, { color: "#34A853" }]}>Vote</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+
         <Text style={styles.title}>Quick actions for students</Text>
 
         <FlatList
@@ -232,6 +301,66 @@ const styles = StyleSheet.create({
     width: 160,
     height: 160,
     opacity: 0.95,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#111",
+    marginBottom: 15,
+    marginLeft: 4,
+  },
+  statsContainer: {
+    marginBottom: 25,
+  },
+  statCard: {
+    backgroundColor: "#fff",
+    borderRadius: 20,
+    padding: 15,
+    marginBottom: 12,
+    width: "100%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  statRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 15,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 15,
+  },
+  statTextContainer: {
+    flex: 1,
+  },
+  statLabel: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "600",
+    marginBottom: 2,
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: "800",
+  },
+  trendPill: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+  },
+  trendText: {
+    fontSize: 12,
+    fontWeight: "700",
+    marginLeft: 4,
   },
   lostfound: {
     top: 14,

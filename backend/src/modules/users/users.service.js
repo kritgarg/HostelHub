@@ -68,3 +68,13 @@ export const updateMe = async ({ userId, name, oldPassword, newPassword }) => {
 
   return updated;
 };
+
+export const getStudentStats = async ({ userId }) => {
+  const [pendingLeaves, activeComplaints, activePolls] = await Promise.all([
+    prisma.leave.count({ where: { userId: Number(userId), status: "PENDING" } }),
+    prisma.complaint.count({ where: { userId: Number(userId), NOT: { status: "RESOLVED" } } }),
+    prisma.poll.count(), // Total active polls (could filter by date if needed)
+  ]);
+
+  return { pendingLeaves, activeComplaints, activePolls };
+};

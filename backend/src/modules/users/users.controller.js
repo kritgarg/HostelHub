@@ -21,3 +21,9 @@ export const updateMe = async (req, res) => {
 
   res.json(updated);
 };
+
+export const getStudentStats = async (req, res) => {
+  const userId = req.user.id;
+  const stats = await UsersService.getStudentStats({ userId });
+  res.json(stats);
+};
