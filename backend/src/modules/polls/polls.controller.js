@@ -14,7 +14,8 @@ export const createPoll = async (req, res) => {
 
 export const listPolls = async (req, res) => {
   const { active = "true", page = 1, limit = 20 } = req.query;
-  const data = await PollsService.listPolls({ active: String(active) === "true", page: Number(page), limit: Number(limit) });
+  const userId = req.user.id;
+  const data = await PollsService.listPolls({ active: String(active) === "true", page: Number(page), limit: Number(limit), userId });
   res.json(data);
 };
 
@@ -33,6 +34,7 @@ export const vote = async (req, res) => {
   const pollId = Number(req.params.pollId);
   const userId = req.user.id;
   const { option } = req.body || {};
+  console.log(`Vote request: pollId=${pollId}, userId=${userId}, option=${option}`);
   if (!option) {
     const e = new Error("option is required");
     e.status = 400;

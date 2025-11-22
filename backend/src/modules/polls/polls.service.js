@@ -11,8 +11,7 @@ export const createPoll = async ({ question, options, createdBy }) => {
   });
 };
 
-export const listPolls = async ({ active = true, page = 1, limit = 20 }) => {
-  // No expiresAt in schema; 'active' simply returns all for now
+export const listPolls = async ({ active = true, page = 1, limit = 20, userId }) => {
   const where = {};
   const [items, total] = await Promise.all([
     prisma.poll.findMany({
@@ -20,11 +19,42 @@ export const listPolls = async ({ active = true, page = 1, limit = 20 }) => {
       orderBy: { createdAt: "desc" },
       skip: (page - 1) * limit,
       take: limit,
-      select: { id: true, question: true, options: true, createdAt: true },
+      include: {
+        votes: true,
+      }
     }),
     prisma.poll.count({ where }),
   ]);
-  return { items, total, page, limit };
+
+  const formattedItems = items.map(poll => {
+    // Calculate vote counts per option
+    const voteCounts = {};
+    poll.votes.forEach(v => {
+      voteCounts[v.option] = (voteCounts[v.option] || 0) + 1;
+    });
+
+    // Check if user has voted
+    const hasVoted = poll.votes.some(v => v.userId === userId);
+
+    // Format options
+    const options = (Array.isArray(poll.options) ? poll.options : []).map((opt, index) => ({
+      id: index, // Simple index as ID since options are strings in DB
+      text: opt,
+      votes: voteCounts[opt] || 0
+    }));
+
+    return {
+      id: poll.id,
+      title: poll.question, // Frontend expects 'title'
+      description: "Cast your vote now!", // Default description
+      type: "general", // Default type
+      options,
+      hasVoted,
+      createdAt: poll.createdAt
+    };
+  });
+
+  return { items: formattedItems, total, page, limit };
 };
 
 export const getPollById = async ({ id }) => {
@@ -42,6 +72,7 @@ export const vote = async ({ pollId, userId, option }) => {
     throw e;
   }
   const opts = Array.isArray(poll.options) ? poll.options : [];
+  console.log(`Poll options: ${JSON.stringify(opts)}, Requested option: ${option}`);
   if (!opts.includes(option)) {
     const e = new Error("Invalid option");
     e.status = 400;
@@ -75,7 +106,7 @@ export const results = async ({ id }) => {
 };
 
 export const deletePoll = async ({ id }) => {
-  // Optionally delete votes first if onDelete is not cascaded
+
   await prisma.pollVote.deleteMany({ where: { pollId: Number(id) } });
   return prisma.poll.delete({ where: { id: Number(id) }, select: { id: true } });
 };

@@ -8,6 +8,7 @@ import {
   approveLeave,
   rejectLeave,
   getById,
+  deleteLeave,
 } from "./leave.controller.js";
 
 const router = Router();
@@ -15,6 +16,7 @@ const router = Router();
 // student
 router.post("/apply", auth, role("STUDENT"), applyLeave);
 router.get("/my-leaves", auth, role("STUDENT"), getMyLeaves);
+router.delete("/:id", auth, role("STUDENT"), deleteLeave);
 
 // warden
 router.get("/pending", auth, role("WARDEN"), listPending);

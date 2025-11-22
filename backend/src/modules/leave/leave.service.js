@@ -122,3 +122,22 @@ export const getById = async ({ id }) => {
     },
   });
 };
+
+export const deleteLeave = async ({ id, userId }) => {
+  const existing = await prisma.leave.findUnique({ where: { id: Number(id) } });
+  if (!existing) {
+    const e = new Error("Leave not found");
+    e.status = 404;
+    throw e;
+  }
+  if (existing.userId !== userId) {
+    const e = new Error("Forbidden");
+    e.status = 403;
+    throw e;
+  }
+  // Optional: Prevent deleting if already approved/rejected? 
+  // For now, allow deleting any.
+  
+  await prisma.leave.delete({ where: { id: Number(id) } });
+  return { success: true };
+};

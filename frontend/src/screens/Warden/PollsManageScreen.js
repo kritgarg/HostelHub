@@ -19,7 +19,7 @@ export default function PollsManageScreen({ navigation }) {
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return polls;
-    return polls.filter((p) => p.question?.toLowerCase().includes(s));
+    return polls.filter((p) => p.title?.toLowerCase().includes(s));
   }, [q, polls]);
 
   const load = async () => {
@@ -129,14 +129,14 @@ export default function PollsManageScreen({ navigation }) {
             return (
               <TouchableOpacity key={p.id} style={styles.card} activeOpacity={0.9} onPress={() => toggleExpand(p.id)}>
                 <View style={styles.cardHeader}>
-                  <Text style={styles.cardTitle} numberOfLines={2}>{p.question}</Text>
+                  <Text style={styles.cardTitle} numberOfLines={2}>{p.title}</Text>
                   {created ? <Text style={styles.cardDate}>{created.toLocaleDateString()}</Text> : null}
                 </View>
                 <Text style={styles.cardSub}>{Array.isArray(p.options) ? p.options.length : 0} options</Text>
                 {expanded && Array.isArray(p.options) && (
                   <View style={styles.optWrap}>
                     {p.options.map((opt, i) => (
-                      <View key={i} style={styles.optChip}><Text style={styles.optText}>{opt}</Text></View>
+                      <View key={i} style={styles.optChip}><Text style={styles.optText}>{opt.text || opt}</Text></View>
                     ))}
                   </View>
                 )}

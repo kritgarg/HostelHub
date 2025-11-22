@@ -1,11 +1,97 @@
 import React, { useContext } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, ScrollView, FlatList } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../../context/AuthContext";
+import Tile from "../../components/Tile";
 
 export default function WardenHomeScreen({ navigation }) {
   const { user } = useContext(AuthContext);
+
+  const tilesData = [
+    {
+      id: '1',
+      color: "#8fb3ff",
+      label: "Polls",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("Polls"),
+      image: require("../../../assets/polls.png"),
+      imageStyle: "tileImagePolls"
+    },
+    {
+      id: '2',
+      color: "#f5cf6a",
+      label: "Mess",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("MessMenu"),
+      image: require("../../../assets/mess.png"),
+      imageStyle: "tileImageMess"
+    },
+    {
+      id: '3',
+      color: "#b9e1d0",
+      label: "Complaints",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("Complaints"),
+      image: require("../../../assets/complaints.png"),
+      imageStyle: "complaints"
+    },
+    {
+      id: '4',
+      color: "#e6d0c6",
+      label: "Leaves",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("PendingLeaves"),
+      image: require("../../../assets/leaves.png"),
+      imageStyle: "tileImageLeave"
+    },
+    {
+      id: '5',
+      color: "#ffd6a5",
+      label: "Notifications",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("Notifications"),
+      image: require("../../../assets/notifications.png"),
+      imageStyle: "notifications"
+    },
+    {
+      id: '6',
+      color: "#cde6ff",
+      label: "Marketplace",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("Marketplace"),
+      image: require("../../../assets/marketplace.png"),
+      imageStyle: "marketplace"
+    },
+    {
+      id: '7',
+      color: "#e9d7ff",
+      label: "Lost & Found",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("LostFound"),
+      image: require("../../../assets/lostfound.png"),
+      imageStyle: "lostfound"
+    },
+    {
+      id: '8',
+      color: "#d1f7c4",
+      label: "User Roles",
+      icon: "arrow-forward",
+      onPress: () => navigation.navigate("UserRoles"),
+      image: require("../../../assets/roles.png"),
+      imageStyle: "tileImageUsers"
+    }
+  ];
+
+  const renderTile = ({ item }) => (
+    <Tile
+      color={item.color}
+      label={item.label}
+      icon={item.icon}
+      onPress={item.onPress}
+      image={item.image}
+      imageStyle={styles[item.imageStyle]}
+    />
+  );
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
@@ -21,87 +107,17 @@ export default function WardenHomeScreen({ navigation }) {
         </View>
         <Text style={styles.title}>Quick actions for your hostel</Text>
 
-        <View style={styles.grid}>
-          <Tile
-            color="#8fb3ff"
-            label="Polls"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("Polls")}
-            image={require("../../../assets/polls.png")}
-            imageStyle={styles.tileImagePolls}
-          />
-          <Tile
-            color="#f5cf6a"
-            label="Mess"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("MessMenu")}
-            image={require("../../../assets/mess.png")}
-            imageStyle={styles.tileImageMess}
-          />
-          <Tile
-            color="#b9e1d0"
-            label="Complaints"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("Complaints")}
-            image={require("../../../assets/complaints.png")}
-            imageStyle={styles.complaints}
-          />
-          <Tile
-            color="#e6d0c6"
-            label="Leaves"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("PendingLeaves")}
-            image={require("../../../assets/leaves.png")}
-          />
-          <Tile
-            color="#ffd6a5"
-            label="Notifications"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("Notifications")}
-            image={require("../../../assets/notifications.png")}
-            imageStyle={styles.notifications}
-          />
-          <Tile
-            color="#cde6ff"
-            label="Marketplace"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("Marketplace")}
-            image={require("../../../assets/marketplace.png")}
-            imageStyle={styles.marketplace}
-          />
-          <Tile
-            color="#e9d7ff"
-            label="Lost & Found"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("LostFound")}
-            image={require("../../../assets/lostfound.png")}
-            imageStyle={styles.lostfound}
-          />
-          <Tile
-            color="#d1f7c4"
-            label="User Roles"
-            icon="arrow-forward"
-            onPress={() => navigation.navigate("UserRoles")}
-            image={require("../../../assets/roles.png")}
-            imageStyle={styles.tileImageUsers}
-          />
-        </View>
+        <FlatList
+          data={tilesData}
+          renderItem={renderTile}
+          keyExtractor={item => item.id}
+          numColumns={2}
+          columnWrapperStyle={styles.grid}
+          contentContainerStyle={styles.gridContainer}
+          scrollEnabled={false}
+        />
       </ScrollView>
     </SafeAreaView>
-  );
-}
-
-function Tile({ color, label, onPress, icon, image, imageStyle }) {
-  return (
-    <TouchableOpacity style={[styles.tile, { backgroundColor: color }]} onPress={onPress} activeOpacity={0.9}>
-      <Text style={styles.tileText}>{label}</Text>
-      {image ? (
-        <Image source={image} style={[styles.tileImage, imageStyle]} resizeMode="contain" />
-      ) : null}
-      <View style={styles.tileIcon}>
-        <Ionicons name={icon} size={18} color="#111" />
-      </View>
-    </TouchableOpacity>
   );
 }
 
@@ -160,22 +176,10 @@ const styles = StyleSheet.create({
     marginBottom: 16 
   },
   grid: { 
-    flexDirection: "row", 
-    flexWrap: "wrap", 
-    gap: 14 
+    justifyContent: "space-between"
   },
-  tile: {
-    width: "48%",
-    aspectRatio: 1,
-    borderRadius: 22,
-    padding: 16,
-    justifyContent: "space-between",
-    overflow: "hidden",
-  },
-  tileText: { 
-    color: "#111", 
-    fontSize: 16, 
-    fontWeight: "700" 
+  gridContainer: {
+    paddingBottom: 20
   },
   tileImageUsers: {
     left: 15,
@@ -183,23 +187,6 @@ const styles = StyleSheet.create({
     width: 150,
     height: 150,
     opacity: 0.8,
-  },
-  tileIcon: {
-    alignSelf: "flex-end",
-    width: 34,
-    height: 34,
-    borderRadius: 10,
-    backgroundColor: "rgba(255,255,255,0.85)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  tileImage: {
-    position: "absolute",
-    top: 6,
-    left: 5,
-    width: 170,
-    height: 170,
-    opacity: 0.9,
   },
   tileImagePolls: {
     position: "absolute",

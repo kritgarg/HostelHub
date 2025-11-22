@@ -68,3 +68,10 @@ export const getById = async (req, res) => {
   }
   res.json(leave);
 };
+
+export const deleteLeave = async (req, res) => {
+  const id = Number(req.params.id);
+  const userId = req.user.id;
+  await LeaveService.deleteLeave({ id, userId });
+  res.json({ success: true });
+};
