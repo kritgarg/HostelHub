@@ -103,7 +103,7 @@ export default function StudentHomeScreen({ navigation }) {
             Ready to manage your <Text style={styles.heroTitleBold}>hostel life?</Text>
           </Text>
           <View style={styles.heroInput}>
-            <Text style={styles.heroInputText}>Search leave status, complaints...</Text>
+            <Text style={styles.heroInputText}>Leave status, complaints...</Text>
           </View>
         </View>
         <Text style={styles.title}>Quick actions for students</Text>

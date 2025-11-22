@@ -102,7 +102,7 @@ export default function WardenHomeScreen({ navigation }) {
             Ready to manage today's <Text style={styles.heroTitleBold}>hostel operations?</Text>
           </Text>
           <View style={styles.heroInput}>
-            <Text style={styles.heroInputText}>Search students, leaves, complaints...</Text>
+            <Text style={styles.heroInputText}>Students, leaves, complaints...</Text>
           </View>
         </View>
         <Text style={styles.title}>Quick actions for your hostel</Text>
