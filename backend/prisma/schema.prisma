@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 // ====================================
@@ -60,6 +60,7 @@ model User {
   votes         PollVote[]
   lostfound     LostFound[]
   notifications Notification[]
+  notificationReads NotificationRead[]
 }
 
 // ====================================
@@ -184,11 +185,25 @@ model LostFound {
 
 model Notification {
   id        Int      @id @default(autoincrement())
-  userId    Int
+  userId    Int?
+  targetRole Role?
   title     String
   message   String
-  read      Boolean   @default(false)
+  read      Boolean   @default(false) // Only used for individual notices
   createdAt DateTime  @default(now())
 
-  user      User      @relation(fields: [userId], references: [id])
+  user      User?     @relation(fields: [userId], references: [id])
+  reads     NotificationRead[]
+}
+
+model NotificationRead {
+  id             Int          @id @default(autoincrement())
+  userId         Int
+  notificationId Int
+  createdAt      DateTime     @default(now())
+
+  user           User         @relation(fields: [userId], references: [id])
+  notification   Notification @relation(fields: [notificationId], references: [id])
+
+  @@unique([userId, notificationId])
 }

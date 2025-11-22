@@ -1,11 +1,14 @@
 import React, { useContext, useEffect, useMemo, useState, useCallback } from "react";
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, FlatList, TouchableOpacity, TextInput } from "react-native";
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, TextInput, ActivityIndicator, RefreshControl } from "react-native";
 import { AuthContext } from "../../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import API from "../../api/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-// Memoized notice card component to prevent unnecessary re-renders
+const CACHE_KEY = "notices_cache";
+
+
 const NoticeCard = React.memo(({ item, onMarkAsRead, formatDate }) => {
   const handleMarkAsRead = useCallback(() => {
     onMarkAsRead(item.id);
@@ -40,13 +43,15 @@ export default function NoticesScreen({ navigation }) {
   const insets = useSafeAreaInsets();
   const [notices, setNotices] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const headerBg = "#ffd6a5";
 
-  // Memoize functions to prevent recreation
   const formatDate = useCallback((dateString) => {
     try {
-      return new Date(dateString).toLocaleDateString();
+      return new Date(dateString).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     } catch {
       return dateString;
     }
@@ -54,127 +59,122 @@ export default function NoticesScreen({ navigation }) {
 
   const markAsRead = useCallback(async (id) => {
     try {
-      // Optimistic update - update UI immediately
-      setNotices(prevNotices => 
-        prevNotices.map(notice => 
-          notice.id === id ? { ...notice, read: true } : notice
-        )
-      );
-      
-      // Then call API
+      setNotices(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
       await API.put(`/notifications/${id}/read`);
+      // Update cache
+      const currentCache = await AsyncStorage.getItem(CACHE_KEY);
+      if (currentCache) {
+        const parsed = JSON.parse(currentCache);
+        const updated = parsed.map(n => n.id === id ? { ...n, read: true } : n);
+        await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(updated));
+      }
     } catch (e) {
-      // Revert on error
-      setNotices(prevNotices => 
-        prevNotices.map(notice => 
-          notice.id === id ? { ...notice, read: false } : notice
-        )
-      );
+      setNotices(prev => prev.map(n => n.id === id ? { ...n, read: false } : n));
     }
   }, []);
 
-  // Memoize filtered notices to prevent recalculation on every render
-  const filteredNotices = useMemo(() => {
-    if (!searchQuery.trim()) return notices;
-    const query = searchQuery.trim().toLowerCase();
-    return notices.filter(notice => 
-      notice.title?.toLowerCase().includes(query) || 
-      notice.message?.toLowerCase().includes(query)
-    );
-  }, [searchQuery, notices]);
-
-  // Debounced search to prevent excessive filtering
-  const [debouncedSearchQuery, setDebouncedSearchQuery] = useState("");
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchQuery(searchQuery);
-    }, 300); // 300ms delay
-    
-    return () => clearTimeout(timer);
-  }, [searchQuery]);
-
-  // Load notices only once on mount
-  useEffect(() => {
-    loadNotices();
-  }, []);
-
-  const loadNotices = useCallback(async () => {
-    if (loading) return; // Prevent duplicate requests
+  const loadNotices = useCallback(async (pageNum = 1, shouldRefresh = false) => {
+    if (loading) return;
     
     try {
       setLoading(true);
-      const res = await API.get("/notifications");
+      const res = await API.get(`/notifications?page=${pageNum}&limit=15`);
       const payload = res?.data;
-      let list = [];
-      if (Array.isArray(payload)) list = payload;
-      else if (Array.isArray(payload?.items)) list = payload.items;
-      else if (Array.isArray(payload?.data?.items)) list = payload.data.items;
-      else if (Array.isArray(payload?.data)) list = payload.data;
-      setNotices(list);
+      let newItems = [];
+      
+      if (Array.isArray(payload)) newItems = payload;
+      else if (Array.isArray(payload?.items)) newItems = payload.items;
+      else if (Array.isArray(payload?.data?.items)) newItems = payload.data.items;
+      
+      if (shouldRefresh) {
+        setNotices(newItems);
+        await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(newItems)); // Cache first page
+      } else {
+        setNotices(prev => [...prev, ...newItems]);
+      }
+
+      setHasMore(newItems.length === 15);
+      setPage(pageNum);
     } catch (e) {
-      setNotices([]);
+      console.log("Failed to load notices", e);
+      setHasMore(false); // Stop pagination on error
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, [loading]);
 
-  // Memoized render function for FlatList
-  const renderNotice = useCallback(({ item }) => (
-    <NoticeCard 
-      item={item} 
-      onMarkAsRead={markAsRead} 
-      formatDate={formatDate} 
-    />
-  ), [markAsRead, formatDate]);
+  // Load from cache initially
+  useEffect(() => {
+    const loadCache = async () => {
+      const cached = await AsyncStorage.getItem(CACHE_KEY);
+      if (cached) {
+        setNotices(JSON.parse(cached));
+      }
+      loadNotices(1, true);
+    };
+    loadCache();
+  }, []);
 
-  // Memoized key extractor
-  const keyExtractor = useCallback((item) => item.id?.toString(), []);
+  const handleRefresh = () => {
+    setRefreshing(true);
+    loadNotices(1, true);
+  };
+
+  const handleLoadMore = () => {
+    if (!loading && hasMore && !searchQuery) {
+      loadNotices(page + 1);
+    }
+  };
+
+  const filteredNotices = useMemo(() => {
+    if (!searchQuery.trim()) return notices;
+    const query = searchQuery.trim().toLowerCase();
+    return notices.filter(n => 
+      n.title?.toLowerCase().includes(query) || 
+      n.message?.toLowerCase().includes(query)
+    );
+  }, [searchQuery, notices]);
+
+  const renderHeader = () => (
+    <View style={[styles.hero, { backgroundColor: headerBg }]}> 
+      <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack?.()}>
+        <Ionicons name="chevron-back" size={18} color="#111" />
+      </TouchableOpacity>
+      <Text style={styles.kicker}>Notices</Text>
+      <Text style={styles.heading}>Stay updated with latest announcements. 📢</Text>
+      <View style={styles.searchWrap}>
+        <Ionicons name="search" size={18} color="#555" />
+        <TextInput
+          placeholder="Search notices..."
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          style={styles.searchInput}
+          placeholderTextColor="#777"
+        />
+      </View>
+    </View>
+  );
+
+  const renderFooter = () => {
+    if (!loading) return <View style={{ height: 100 }} />;
+    return <ActivityIndicator size="small" color="#111" style={{ marginVertical: 20 }} />;
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 120 }}>
-        <View style={[styles.hero, { backgroundColor: headerBg }]}> 
-          <TouchableOpacity style={styles.backBtn} onPress={() => navigation?.goBack?.()}>
-            <Ionicons name="chevron-back" size={18} color="#111" />
-          </TouchableOpacity>
-          <Text style={styles.kicker}>Notices</Text>
-          <Text style={styles.heading}>Stay updated with latest announcements from hostel management.</Text>
-          <View style={styles.searchWrap}>
-            <Ionicons name="search" size={18} color="#555" />
-            <TextInput
-              placeholder="Search notices..."
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              style={styles.searchInput}
-              placeholderTextColor="#777"
-            />
-          </View>
-        </View>
-
-        <View style={styles.listWrap}>
-          {loading && <Text style={styles.muted}>Loading...</Text>}
-          {!loading && filteredNotices.length === 0 && <Text style={styles.muted}>No notices</Text>}
-          {!loading && filteredNotices.length > 0 && (
-            <FlatList
-              data={filteredNotices}
-              renderItem={renderNotice}
-              keyExtractor={keyExtractor}
-              scrollEnabled={false}
-              removeClippedSubviews={true}
-              maxToRenderPerBatch={10}
-              updateCellsBatchingPeriod={50}
-              initialNumToRender={10}
-              windowSize={10}
-              getItemLayout={(data, index) => ({
-                length: 120, // Approximate height of each card
-                offset: 120 * index,
-                index,
-              })}
-            />
-          )}
-        </View>
-      </ScrollView>
+      <FlatList
+        data={filteredNotices}
+        renderItem={({ item }) => <NoticeCard item={item} onMarkAsRead={markAsRead} formatDate={formatDate} />}
+        keyExtractor={(item) => item.id?.toString()}
+        contentContainerStyle={styles.listContent}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={renderFooter}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+        onEndReached={handleLoadMore}
+        onEndReachedThreshold={0.5}
+        ListEmptyComponent={!loading && <Text style={styles.muted}>No notices found</Text>}
+      />
     </View>
   );
 }
@@ -184,8 +184,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#f2f0e7ff",
   },
+  listContent: {
+    paddingBottom: 20,
+  },
   hero: { 
     margin: 16, 
+    marginBottom: 24,
     padding: 20, 
     borderRadius: 26, 
     borderBottomLeftRadius: 6, 
@@ -202,13 +206,15 @@ const styles = StyleSheet.create({
   },
   kicker: { 
     color: "#1a1a1a", 
-    opacity: 0.7 
+    opacity: 0.7,
+    fontWeight: "600",
+    fontSize: 13
   },
   heading: { 
     fontSize: 24, 
     fontWeight: "800", 
     color: "#111", 
-    marginTop: 6, 
+    marginTop: 4, 
     marginBottom: 14 
   },
   searchWrap: { 
@@ -222,70 +228,81 @@ const styles = StyleSheet.create({
   searchInput: { 
     flex: 1, 
     paddingHorizontal: 8, 
-    color: "#111" 
-  },
-  listWrap: { 
-    paddingHorizontal: 16, 
-    marginTop: 8 
+    color: "#111",
+    fontWeight: "500"
   },
   muted: { 
     color: "#777", 
     textAlign: "center", 
-    paddingVertical: 14 
+    paddingVertical: 40,
+    fontSize: 16
   },
   card: { 
     backgroundColor: "#fff", 
-    borderRadius: 18, 
-    padding: 14, 
-    marginBottom: 12, 
+    borderRadius: 22, 
+    padding: 18, 
+    marginHorizontal: 16,
+    marginBottom: 14, 
     shadowColor: "#000", 
-    shadowOffset: { width: 0, height: 6 }, 
+    shadowOffset: { width: 0, height: 4 }, 
     shadowOpacity: 0.06, 
-    shadowRadius: 10, 
-    elevation: 3 
+    shadowRadius: 12, 
+    elevation: 3,
+    borderLeftWidth: 4,
+    borderLeftColor: "#ffd6a5"
   },
   cardHeader: { 
     flexDirection: "row", 
-    alignItems: "center" 
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    marginBottom: 8
   },
   cardTitle: { 
     flex: 1, 
-    fontSize: 16, 
-    fontWeight: "800", 
-    color: "#111" 
+    fontSize: 17, 
+    fontWeight: "700", 
+    color: "#111",
+    marginRight: 10
   },
   badge: { 
     paddingHorizontal: 10, 
-    paddingVertical: 6, 
-    borderRadius: 12 
+    paddingVertical: 4, 
+    borderRadius: 8 
   },
   badgeText: { 
-    fontWeight: "800", 
-    color: "#111" 
+    fontWeight: "700", 
+    color: "#111",
+    fontSize: 11,
+    textTransform: "uppercase"
   },
   badgeYellow: { 
-    backgroundColor: "#fef9c3" 
+    backgroundColor: "#fff9c4" 
   },
   badgeGray: { 
-    backgroundColor: "#e5e7eb" 
+    backgroundColor: "#f3f4f6" 
   },
   desc: { 
-    marginTop: 6, 
-    color: "#333" 
+    color: "#444", 
+    lineHeight: 22,
+    fontSize: 15
   },
   actionsRow: { 
     flexDirection: "row", 
     alignItems: "center", 
     justifyContent: "space-between", 
-    marginTop: 12 
+    marginTop: 16,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0"
   },
   date: {
-    color: "#666",
-    fontSize: 12,
+    color: "#888",
+    fontSize: 13,
+    fontWeight: "500"
   },
   smallBtn: { 
-    paddingVertical: 10, 
-    paddingHorizontal: 12, 
+    paddingVertical: 8, 
+    paddingHorizontal: 14, 
     borderRadius: 10 
   },
   primaryBtn: { 
@@ -293,6 +310,7 @@ const styles = StyleSheet.create({
   },
   primaryText: { 
     color: "#fff", 
-    fontWeight: "700" 
+    fontWeight: "700",
+    fontSize: 13
   },
 });

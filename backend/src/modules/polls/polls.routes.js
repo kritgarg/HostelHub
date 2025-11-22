@@ -13,17 +13,10 @@ import {
 const router = Router();
 
 router.post("/", auth, role("WARDEN", "ADMIN"), createPoll);
-
-
 router.get("/", auth, listPolls);
 router.get("/:id", auth, getPollById);
-
-
 router.post("/:pollId/vote", auth, role("STUDENT"), vote);
-
 router.get("/results/:id", auth, role("WARDEN", "ADMIN"), results);
-
-
 router.delete("/:id", auth, role("WARDEN", "ADMIN"), deletePoll);
 
 export default router;

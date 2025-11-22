@@ -68,7 +68,7 @@ export default function ComplaintsListScreen() {
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
           <Text style={styles.date}>{new Date(item.createdAt).toLocaleDateString()}</Text>
           <TouchableOpacity onPress={() => handleDelete(item.id)}>
-            <Ionicons name="trash-outline" size={18} color="#FF5252" />
+            <Ionicons name="trash-outline" size={18} color="#D32F2F" />
           </TouchableOpacity>
         </View>
       </View>

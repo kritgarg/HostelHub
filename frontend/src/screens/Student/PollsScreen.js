@@ -4,6 +4,7 @@ import { AuthContext } from "../../context/AuthContext";
 import { Ionicons } from "@expo/vector-icons";
 import API from "../../api/api";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 // Animated Poll Card Component
 const PollCard = React.memo(({ poll, onVote, formatDate, animatedValue }) => {
@@ -157,7 +158,10 @@ export default function PollsScreen({ navigation }) {
     }
   }, []);
 
-  const loadPolls = useCallback(async () => {
+  // Cache key
+  const CACHE_KEY = "polls_cache";
+
+  const loadPolls = useCallback(async (shouldRefresh = false) => {
     if (loading) return;
     
     try {
@@ -185,20 +189,38 @@ export default function PollsScreen({ navigation }) {
       });
       
       setPolls(list);
+      await AsyncStorage.setItem(CACHE_KEY, JSON.stringify(list));
     } catch (e) {
-      setPolls([]);
+      console.log("Failed to load polls", e);
     } finally {
       setLoading(false);
     }
   }, [loading, animatedValues]);
 
+  // Load from cache initially
+  useEffect(() => {
+    const loadCache = async () => {
+      const cached = await AsyncStorage.getItem(CACHE_KEY);
+      if (cached) {
+        const list = JSON.parse(cached);
+        setPolls(list);
+        // Initialize animations for cached items
+        list.forEach((_, index) => {
+          if (!animatedValues[index]) {
+            animatedValues[index] = new Animated.Value(1); // Already visible
+          }
+        });
+      }
+      loadPolls();
+    };
+    loadCache();
+  }, []);
+
   const handleVote = useCallback(async (pollId, optionIndex, optionText) => {
     try {
-      await API.post(`/polls/${pollId}/vote`, { option: optionText });
-      
-      
-      setPolls(prevPolls => 
-        prevPolls.map(poll => {
+      // Optimistic update
+      const updateState = (prevPolls) => {
+        const newPolls = prevPolls.map(poll => {
           if (poll.id === pollId) {
             const updatedOptions = [...poll.options];
             updatedOptions[optionIndex] = {
@@ -208,12 +230,21 @@ export default function PollsScreen({ navigation }) {
             return { ...poll, options: updatedOptions, hasVoted: true };
           }
           return poll;
-        })
-      );
+        });
+        // Update cache asynchronously
+        AsyncStorage.setItem(CACHE_KEY, JSON.stringify(newPolls)).catch(console.error);
+        return newPolls;
+      };
+
+      setPolls(updateState);
+      
+      await API.post(`/polls/${pollId}/vote`, { option: optionText });
     } catch (e) {
+      // Revert on error (simplified: just reload)
+      loadPolls();
       throw e;
     }
-  }, []);
+  }, [loadPolls]);
 
   // Memoized filtered polls
   const filteredPolls = useMemo(() => {
@@ -224,10 +255,6 @@ export default function PollsScreen({ navigation }) {
       poll.description?.toLowerCase().includes(query)
     );
   }, [searchQuery, polls]);
-
-  useEffect(() => {
-    loadPolls();
-  }, []);
 
   const renderPoll = useCallback(({ item, index }) => (
     <PollCard 
