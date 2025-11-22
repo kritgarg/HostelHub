@@ -12,6 +12,8 @@ import WardenNotificationsScreen from "../screens/Warden/WardenNotificationsScre
 import WardenMarketplaceScreen from "../screens/Warden/WardenMarketplaceScreen";
 import WardenLostFoundScreen from "../screens/Warden/WardenLostFoundScreen";
 import UserRolesManageScreen from "../screens/Warden/UserRolesManageScreen";
+import { View, StyleSheet } from "react-native";
+
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
@@ -31,34 +33,51 @@ function HomeStack() {
   );
 }
 
+const styles = StyleSheet.create({
+  tabBar: {
+    position: "absolute",
+    bottom: 24,
+    height: 60,
+    borderRadius: 25,
+    backgroundColor: "#ffffff",
+    borderTopWidth: 0,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    width: "80%",
+    alignSelf: "center",
+    marginHorizontal: "10%",
+    paddingBottom: 0,
+    paddingTop: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  activeIcon: {
+    backgroundColor: "#f5cf6a", 
+    shadowColor: "#f5cf6a",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+});
+
 export default function WardenNavigator() {
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: "#111",
-        tabBarInactiveTintColor: "#aaa",
-        tabBarStyle: {
-          position: "absolute",
-          bottom: 30,
-          height: 63,
-          borderRadius: 28,
-          backgroundColor: "#ede7c4ff",
-          borderTopWidth: 0,
-          elevation: 10,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 10 },
-          shadowOpacity: 0.12,
-          shadowRadius: 16,
-          paddingBottom: 8,
-          paddingTop: 8,
-          width: "80%",
-          alignSelf: "center",
-          marginHorizontal: 40,
-          paddingHorizontal: 0,
-          
-        },
+        tabBarStyle: styles.tabBar,
       }}
     >
       <Tab.Screen
@@ -68,31 +87,12 @@ export default function WardenNavigator() {
           const routeName = getFocusedRouteNameFromRoute(route) ?? "WardenHome";
           const hide = routeName !== "WardenHome";
           return {
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? "home" : "home-outline"} size={26} color={color} />
+            tabBarIcon: ({ focused }) => (
+              <View style={[styles.iconContainer, focused && styles.activeIcon]}>
+                <Ionicons name={focused ? "home" : "home-outline"} size={24} color={focused ? "#111" : "#aaa"} />
+              </View>
             ),
-            tabBarStyle: [
-              {
-                position: "absolute",
-                bottom: 30,
-                height: 63,
-                borderRadius: 28,
-                backgroundColor: "#ede7c4ff",
-                borderTopWidth: 0,
-                elevation: 10,
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 10 },
-                shadowOpacity: 0.12,
-                shadowRadius: 16,
-                paddingBottom: 8,
-                paddingTop: 8,
-                width: "80%",
-                alignSelf: "center",
-                marginHorizontal: 40,
-                paddingHorizontal: 0,
-              },
-              hide ? { display: "none" } : null,
-            ],
+            tabBarStyle: [styles.tabBar, hide ? { display: "none" } : null],
           };
         }}
       />
@@ -100,8 +100,10 @@ export default function WardenNavigator() {
         name="Profile"
         component={WardenProfileScreen}
         options={{
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons name={focused ? "person" : "person-outline"} size={26} color={color} />
+          tabBarIcon: ({ focused }) => (
+            <View style={[styles.iconContainer, focused && styles.activeIcon]}>
+              <Ionicons name={focused ? "person" : "person-outline"} size={24} color={focused ? "#111" : "#aaa"} />
+            </View>
           ),
         }}
       />
