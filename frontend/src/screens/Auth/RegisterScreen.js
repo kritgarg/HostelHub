@@ -43,16 +43,16 @@ export default function RegisterScreen({ navigation }) {
       setSubmitting(true);
       console.log('Attempting to register with:', { name, email });
       
-      // Make the registration API call
+
       const response = await registerApi({ name, email, password });
       console.log('Registration response:', JSON.stringify(response, null, 2));
       
-      // Check if registration was successful
+
       if (!response || !response.data) {
         throw new Error('Invalid response from server');
       }
       
-      // Try to extract token from different possible response structures
+      
       let token;
       if (response.data.token) {
         token = response.data.token;
@@ -64,10 +64,9 @@ export default function RegisterScreen({ navigation }) {
         console.log('Token found in registration response, saving...');
         await AsyncStorage.setItem("token", token);
         
-        // Get user data
-        console.log('Fetching user data after registration...');
+        
         const me = await getMe();
-        console.log('User data after registration:', JSON.stringify(me, null, 2));
+        
         
         let userData = me?.data?.data || me?.data;
         if (userData) {
@@ -76,9 +75,7 @@ export default function RegisterScreen({ navigation }) {
           return { success: true };
         }
       }
-      
-      // If auto-login with token didn't work, try traditional login
-      console.log('Attempting traditional login after registration...');
+
       const loginResult = await login(email, password);
       if (!loginResult.success) {
         throw new Error(loginResult.error || 'Registration successful but failed to log in. Please try logging in manually.');
@@ -105,7 +102,7 @@ export default function RegisterScreen({ navigation }) {
       >
         <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           
-          {/* Header / Logo Area */}
+          
           <View style={styles.header}>
             <View style={styles.logoCircle}>
               <Ionicons name="person-add" size={40} color="#fff" />

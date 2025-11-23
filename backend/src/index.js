@@ -63,4 +63,5 @@ app.use(errorHandler);
 app.listen(ENV.PORT, () => {
   console.log(`Server running on port ${ENV.PORT}`);
 });
-export default {app, prisma};
+export { prisma };
+export default app;
