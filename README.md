@@ -81,7 +81,10 @@ Traditional hostel management relies on manual registers, paper forms, and verba
 
 👉 [https://youtu.be/3d4AHw-Zgcc](https://youtu.be/3d4AHw-Zgcc)
 
-![Demo GIF](./frontend/assets/screenshots/hostelhub_demo.gif)
+<p align="center">
+  <img src="./frontend/assets/screenshots/hostelhub_demo.gif" height="200"/>
+</p>
+
 
 ---
 
