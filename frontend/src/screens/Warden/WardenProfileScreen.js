@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Modal, Alert, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Modal, Alert, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../../context/AuthContext";
-import API, { getAvatarUrl } from "../../api/api";
+import API from "../../api/api";
 
 export default function WardenProfileScreen() {
-  const { user: ctxUser, logout } = useContext(AuthContext);
+  const { user: ctxUser, logout, refreshUser } = useContext(AuthContext);
   const [me, setMe] = useState(ctxUser || null);
   const [loading, setLoading] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -20,10 +20,12 @@ export default function WardenProfileScreen() {
   const heroBg = "#f5cf6a"; 
   const cardBg = "#ffffff";
 
-  const avatarSrc = useMemo(() => {
-    const [firstName = "", lastName = ""] = (me?.name || "").split(" ");
-    return me?.avatar || getAvatarUrl(firstName, lastName);
-  }, [me]);
+  const initials = useMemo(() => {
+    const name = (me?.name || "Warden").trim();
+    const parts = name.split(" ");
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return (name[0] || "W").toUpperCase();
+  }, [me?.name]);
 
   const memberSince = useMemo(() => {
     if (!me?.createdAt) return null;
@@ -56,6 +58,7 @@ export default function WardenProfileScreen() {
       await API.patch("/users/me", { name: name.trim() });
       setEditOpen(false);
       await load();
+      if (refreshUser) refreshUser();
     } catch (e) {
       Alert.alert("Error", e?.response?.data?.message || "Failed to update profile");
     } finally { setLoading(false); }
@@ -82,7 +85,18 @@ export default function WardenProfileScreen() {
         <View style={[styles.hero, { backgroundColor: heroBg }]}> 
           <View style={styles.heroContent}>
             <View style={styles.avatarContainer}>
-              <Image source={{ uri: avatarSrc }} style={styles.avatar} />
+              {me?.avatar ? (
+                <>
+                  <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                    <ActivityIndicator color="#fff" />
+                  </View>
+                  <Image source={{ uri: me.avatar }} style={styles.avatar} />
+                </>
+              ) : (
+                <View style={[styles.avatar, { backgroundColor: '#010101ff', justifyContent: 'center', alignItems: 'center' }]}>
+                  <Text style={{ fontSize: 32, fontWeight: '800', color: '#fff' }}>{initials}</Text>
+                </View>
+              )}
               <TouchableOpacity style={styles.editAvatarBtn} onPress={openEdit}>
                 <Ionicons name="pencil" size={14} color="#fff" />
               </TouchableOpacity>
@@ -108,7 +122,7 @@ export default function WardenProfileScreen() {
           <View style={styles.infoCard}>
             <View style={styles.rowItem}>
               <View style={[styles.iconBox, { backgroundColor: "#fff8e1" }]}>
-                <Ionicons name="person" size={20} color="#FFA000" />
+                <Ionicons name="person" size={20} color="#e0b76fff" />
               </View>
               <View style={styles.rowBody}>
                 <Text style={styles.label}>Full Name</Text>
@@ -254,8 +268,14 @@ const styles = StyleSheet.create({
     width: 100, 
     height: 100, 
     borderRadius: 50, 
-    borderWidth: 4, 
     borderColor: "#fff" 
+  },
+  avatarPlaceholder: {
+    position: 'absolute',
+    backgroundColor: '#ccc',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1,
   },
   editAvatarBtn: {
     position: 'absolute',

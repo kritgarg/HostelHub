@@ -20,7 +20,7 @@ export const listMyComplaints = async (req, res) => {
 };
 
 export const listComplaints = async (req, res) => {
-  const { page = 1, limit = 20, status } = req.query; // category not stored in schema
+  const { page = 1, limit = 20, status } = req.query; 
   const data = await ComplaintsService.listComplaints({ page: Number(page), limit: Number(limit), status });
   res.json(data);
 };

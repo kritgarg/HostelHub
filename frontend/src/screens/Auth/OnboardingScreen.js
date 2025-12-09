@@ -57,7 +57,6 @@ export default function OnboardingScreen({ onComplete }) {
           marginHorizontal: 3,
           backgroundColor,
           borderRadius: 4,
-          transition: "all 0.3s",
         }}
       />
     );
@@ -78,11 +77,12 @@ export default function OnboardingScreen({ onComplete }) {
         containerStyles={styles.onboardingContainer}
         bottomBarHeight={80}
         bottomBarHighlight={false}
+        transitionAnimationDuration={200}
         pages={[
           {
-            backgroundColor: "#f2f0e7",
+            backgroundColor: "#d1f7c4", // Greenish tone (Playful Mint)
             image: (
-              <View style={styles.imageWrapper}>
+              <View style={[styles.imageWrapper, { backgroundColor: "#e8fadd" }]}>
                 <Image
                   source={require("../../../assets/pic1.png")}
                   style={styles.image}
@@ -94,11 +94,11 @@ export default function OnboardingScreen({ onComplete }) {
             subtitle: "Your ultimate companion for a seamless hostel life.",
           },
           {
-            backgroundColor: "#e3f2fd", // Light Blue
+            backgroundColor: "#ffcc80", // Orange tone (Playful Peach/Orange)
             image: (
-              <View style={styles.imageWrapper}>
+              <View style={[styles.imageWrapper, { backgroundColor: "#ffe0b2" }]}>
                 <Image
-                  source={require("../../../assets/pic2.png")}
+                  source={require("../../../assets/on1.png")}
                   style={styles.image}
                   resizeMode="contain"
                 />
@@ -108,12 +108,11 @@ export default function OnboardingScreen({ onComplete }) {
             subtitle: "Notices, Polls, and Complaints - all in one place.",
           },
           {
-            backgroundColor: "#fff3e0", // Light Orange
+            backgroundColor: "#fff59d", // Yellow tone (Playful Lemon)
             image: (
-              <View style={styles.imageWrapper}>
-                {/* Placeholder for 3rd image, reusing pic1 or pic2 if pic3 doesn't exist yet */}
+              <View style={[styles.imageWrapper, { backgroundColor: "#fff9c4" }]}>
                 <Image
-                  source={require("../../../assets/pic1.png")} 
+                  source={require("../../../assets/pic3.png")} 
                   style={styles.image}
                   resizeMode="contain"
                 />
@@ -135,31 +134,37 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
   },
   imageWrapper: {
-    width: width * 0.8,
-    height: width * 0.8,
+    width: width * 0.85,
+    height: width * 0.85,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.5)',
-    borderRadius: width * 0.4,
-    marginBottom: 20,
+    borderRadius: (width * 0.85) / 2,
+    marginBottom: 30,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 8,
   },
   image: {
     width: width * 0.7,
     height: width * 0.7,
   },
   title: {
-    fontSize: 28,
-    fontWeight: "800",
-    color: "#111",
-    marginBottom: 10,
+    fontSize: 32,
+    fontWeight: "900",
+    color: "#222",
+    marginBottom: 12,
     textAlign: "center",
+    letterSpacing: 0.5,
   },
   subtitle: {
-    fontSize: 16,
-    color: "#666",
+    fontSize: 18,
+    color: "#555",
+    fontWeight: "500",
     textAlign: "center",
-    paddingHorizontal: 40,
-    lineHeight: 24,
+    paddingHorizontal: 30,
+    lineHeight: 26,
   },
   button: {
     marginRight: 20,

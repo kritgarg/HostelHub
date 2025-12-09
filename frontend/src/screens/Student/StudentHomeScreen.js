@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert, FlatList, TouchableOpacity } from "react-native";
+import React, { useContext, useEffect, useState, useCallback } from "react";
+import { View, Text, StyleSheet, ScrollView, Alert, FlatList, TouchableOpacity, RefreshControl } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AuthContext } from "../../context/AuthContext";
 import API from "../../api/api";
@@ -7,8 +7,9 @@ import Tile from "../../components/Tile";
 import { Ionicons } from "@expo/vector-icons";
 
 export default function StudentHomeScreen({ navigation }) {
-  const { user } = useContext(AuthContext);
+  const { user, refreshUser } = useContext(AuthContext);
   const [stats, setStats] = useState({ pendingLeaves: 0, activeComplaints: 0, activePolls: 0 });
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -22,6 +23,18 @@ export default function StudentHomeScreen({ navigation }) {
       console.log("Error fetching stats:", err);
     }
   };
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      if (refreshUser) await refreshUser();
+      await fetchStats();
+    } catch (error) {
+      console.log("Error refreshing:", error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refreshUser]);
 
   const tilesData = [
     {
@@ -111,7 +124,12 @@ export default function StudentHomeScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView 
+        contentContainerStyle={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#4285F4"]} />
+        }
+      >
         <View style={styles.hero}>
           <Text style={styles.kicker}>Student portal</Text>
           <Text style={styles.heroTitle}>

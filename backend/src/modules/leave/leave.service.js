@@ -7,7 +7,7 @@ export const apply = async ({ userId, from, to, reason }) => {
       fromDate: from,
       toDate: to,
       reason,
-      // status defaults to PENDING via schema
+      
     },
     select: {
       id: true,
@@ -135,8 +135,7 @@ export const deleteLeave = async ({ id, userId }) => {
     e.status = 403;
     throw e;
   }
-  // Optional: Prevent deleting if already approved/rejected? 
-  // For now, allow deleting any.
+
   
   await prisma.leave.delete({ where: { id: Number(id) } });
   return { success: true };

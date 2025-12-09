@@ -41,11 +41,9 @@ export default function RegisterScreen({ navigation }) {
     
     try {
       setSubmitting(true);
-      console.log('Attempting to register with:', { name, email });
       
 
       const response = await registerApi({ name, email, password });
-      console.log('Registration response:', JSON.stringify(response, null, 2));
       
 
       if (!response || !response.data) {
@@ -61,7 +59,6 @@ export default function RegisterScreen({ navigation }) {
       }
       
       if (token) {
-        console.log('Token found in registration response, saving...');
         await AsyncStorage.setItem("token", token);
         
         

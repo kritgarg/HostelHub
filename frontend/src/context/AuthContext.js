@@ -77,14 +77,15 @@ export default function AuthProvider({ children }) {
     }
   };
 
-  const loadUser = async () => {
+  const loadUser = async (showLoading = true) => {
     try {
       const [token, savedUser] = await AsyncStorage.multiGet(['@HostelHub:token', '@HostelHub:user']);
       const tokenValue = token[1];
       const userValue = savedUser[1];
 
       if (!tokenValue) {
-        return setLoading(false);
+        if (showLoading) setLoading(false);
+        return;
       }
 
       // Optimistically set user if available
@@ -119,16 +120,16 @@ export default function AuthProvider({ children }) {
         // Silent fail
       }
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   };
 
   useEffect(() => {
-    loadUser();
+    loadUser(true);
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout, refreshUser: () => loadUser(false) }}>
       {children}
     </AuthContext.Provider>
   );

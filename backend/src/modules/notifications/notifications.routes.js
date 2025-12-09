@@ -5,13 +5,11 @@ import { listMyNotifications, sendNotifications, markRead } from "./notification
 
 const router = Router();
 
-// Fetch notifications for logged-in user
+
 router.get("/", auth, listMyNotifications);
 
-// Send notifications (warden/admin)
 router.post("/send", auth, role("WARDEN", "ADMIN"), sendNotifications);
 
-// Mark single notification as read (owner)
 router.put("/:id/read", auth, markRead);
 
 export default router;

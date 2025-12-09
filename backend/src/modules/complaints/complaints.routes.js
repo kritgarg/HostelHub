@@ -12,15 +12,15 @@ import {
 
 const router = Router();
 
-// student only
+
 router.post("/", auth, role("STUDENT"), createComplaint);
 router.get("/my", auth, role("STUDENT"), listMyComplaints);
 
-// warden/admin
+
 router.get("/", auth, role("WARDEN", "ADMIN"), listComplaints);
 router.put("/update/:id", auth, role("WARDEN", "ADMIN"), updateComplaint);
 
-// owner, warden, admin
+
 router.get("/:id", auth, getComplaintById);
 router.delete("/:id", auth, role("STUDENT", "WARDEN", "ADMIN"), deleteComplaint);
 

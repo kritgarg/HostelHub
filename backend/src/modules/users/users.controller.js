@@ -6,8 +6,6 @@ export const listUsers = async (req, res) => {
   res.json(data);
 };
 
-// PATCH /api/users/me
-// Body can include: { name?, oldPassword?, newPassword? }
 export const updateMe = async (req, res) => {
   const userId = req.user.id;
   const { name, oldPassword, newPassword } = req.body || {};

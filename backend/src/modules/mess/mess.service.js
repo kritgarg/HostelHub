@@ -65,7 +65,7 @@ export const analytics = async ({ from, to }) => {
     _sum: { rating: true },
   });
 
-  // Derive likes/dislikes from total count (n) and sum of +/-1 (s)
+  // likes/dislikes from total 
   const results = await Promise.all(
     grouped.map(async (g) => {
       const n = g._count._all || 0;

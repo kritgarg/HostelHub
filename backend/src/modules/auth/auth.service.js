@@ -30,7 +30,8 @@ export const me = async (userId) => {
 };
 
 export const assignRole = async ({ userId, role }) => {
-  // Ensure role is one of the allowed enum values
+  
+  
   const allowed = ["ADMIN", "WARDEN", "STUDENT"];
   if (!allowed.includes(role)) {
     throw new Error("Invalid role");

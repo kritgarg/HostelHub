@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
-import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Modal, Alert, ScrollView } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity, TextInput, Modal, Alert, ScrollView, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { AuthContext } from "../../context/AuthContext";
@@ -9,7 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient'; // Assuming expo-linear-g
 // but the prompt asked for "vibrant colors". I'll use a solid background color for the hero that is vibrant.
 
 export default function StudentProfileScreen() {
-  const { user: ctxUser, logout } = useContext(AuthContext);
+  const { user: ctxUser, logout, refreshUser } = useContext(AuthContext);
   const [me, setMe] = useState(ctxUser || null);
   const [loading, setLoading] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
@@ -19,15 +19,17 @@ export default function StudentProfileScreen() {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   
-  // Playful Theme Colors
-  const heroBg = "#8fb3ff"; // Periwinkle Blue
+
+  const heroBg = "#8fb3ff"; 
   const cardBg = "#ffffff";
   const accentColor = "#111";
 
-  const avatarSrc = useMemo(() => {
-    const [firstName = "", lastName = ""] = (me?.name || "").split(" ");
-    return me?.avatar || getAvatarUrl(firstName, lastName);
-  }, [me]);
+  const initials = useMemo(() => {
+    const name = (me?.name || "Student").trim();
+    const parts = name.split(" ");
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return (name[0] || "S").toUpperCase();
+  }, [me?.name]);
 
   const memberSince = useMemo(() => {
     if (!me?.createdAt) return null;
@@ -60,6 +62,7 @@ export default function StudentProfileScreen() {
       await API.patch("/users/me", { name: name.trim() });
       setEditOpen(false);
       await load();
+      if (refreshUser) refreshUser();
     } catch (e) {
       Alert.alert("Error", e?.response?.data?.message || "Failed to update profile");
     } finally { setLoading(false); }
@@ -86,7 +89,18 @@ export default function StudentProfileScreen() {
         <View style={[styles.hero, { backgroundColor: heroBg }]}> 
           <View style={styles.heroContent}>
             <View style={styles.avatarContainer}>
-              <Image source={{ uri: avatarSrc }} style={styles.avatar} />
+              {me?.avatar ? (
+                <>
+                  <View style={[styles.avatar, styles.avatarPlaceholder]}>
+                    <ActivityIndicator color="#fff" />
+                  </View>
+                  <Image source={{ uri: me.avatar }} style={styles.avatar} />
+                </>
+              ) : (
+                <View style={[styles.avatar, { backgroundColor: '#6b9eff', justifyContent: 'center', alignItems: 'center' }]}>
+                  <Text style={{ fontSize: 32, fontWeight: '800', color: '#fff' }}>{initials}</Text>
+                </View>
+              )}
               <TouchableOpacity style={styles.editAvatarBtn} onPress={openEdit}>
                 <Ionicons name="pencil" size={14} color="#fff" />
               </TouchableOpacity>
@@ -265,6 +279,13 @@ const styles = StyleSheet.create({
     borderRadius: 50, 
     borderWidth: 4, 
     borderColor: "#fff" 
+  },
+  avatarPlaceholder: {
+    position: 'absolute',
+    backgroundColor: '#ccc', // or a nice theme color like #8fb3ff darkened?
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1,
   },
   editAvatarBtn: {
     position: 'absolute',

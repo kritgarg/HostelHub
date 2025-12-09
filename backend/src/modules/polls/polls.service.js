@@ -27,27 +27,25 @@ export const listPolls = async ({ active = true, page = 1, limit = 20, userId })
   ]);
 
   const formattedItems = items.map(poll => {
-    // Calculate vote counts per option
+
     const voteCounts = {};
     poll.votes.forEach(v => {
       voteCounts[v.option] = (voteCounts[v.option] || 0) + 1;
     });
 
-    // Check if user has voted
     const hasVoted = poll.votes.some(v => v.userId === userId);
 
-    // Format options
     const options = (Array.isArray(poll.options) ? poll.options : []).map((opt, index) => ({
-      id: index, // Simple index as ID since options are strings in DB
+      id: index,
       text: opt,
       votes: voteCounts[opt] || 0
     }));
 
     return {
       id: poll.id,
-      title: poll.question, // Frontend expects 'title'
-      description: "Cast your vote now!", // Default description
-      type: "general", // Default type
+      title: poll.question,
+      description: "Cast your vote now!",
+      type: "general",
       options,
       hasVoted,
       createdAt: poll.createdAt

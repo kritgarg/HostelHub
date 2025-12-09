@@ -37,7 +37,7 @@ app.use("/api/marketplace", marketplaceRoutes);
 app.use("/api/polls", pollsRoutes);
 app.use("/api/lostfound", lostfoundRoutes);
 app.use("/api/notifications", notificationsRoutes);
-// add rest
+
 
 app.get("/api/health", (req, res) => {
   res.json({ status: "ok", time: new Date().toISOString() });
